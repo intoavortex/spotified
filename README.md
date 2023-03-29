@@ -1,4 +1,12 @@
-# Getting Started with Create React App
+# spotified
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/0b7a2a50-acc2-4c62-b81c-d0cd9bf3dc68/deploy-status)](https://app.netlify.com/sites/lucent-cannoli-db3bb3/deploys)
+
+- - -
+
+spotify api 활용 및 음원 사이트 구현하기
+
+<!-- # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
@@ -43,4 +51,4 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+To learn React, check out the [React documentation](https://reactjs.org/). -->
