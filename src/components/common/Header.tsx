@@ -2,7 +2,8 @@ import styled from 'styled-components';
 import { MdHomeFilled } from 'react-icons/md';
 // import {MdHomeFilled } from '@react-md/icon';
 
-import logo from '../../static/img/logo.png';
+import logo from '../../logo.svg';
+// import logo from '../../static/img/logo.png';
 import albumImg from '../../static/img/test.jpeg';
 
 
