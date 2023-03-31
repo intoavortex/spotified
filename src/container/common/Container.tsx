@@ -52,7 +52,7 @@ export function Container() {
       <ContainerHeader />
       <ContentCotainer>
         <Contents>
-          <CoverThumbnailList title={'아니 플레이어'}/>
+          <CoverThumbnailList title={'아니 플레이어 도대체'}/>
           <CoverThumbnailList title={'어찌합니까?'}/>
         </Contents>
       </ContentCotainer>
