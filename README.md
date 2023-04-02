@@ -1,6 +1,11 @@
-# spotified ![React] [![Netlify Status](https://api.netlify.com/api/v1/badges/0b7a2a50-acc2-4c62-b81c-d0cd9bf3dc68/deploy-status)](https://app.netlify.com/sites/lucent-cannoli-db3bb3/deploys)
+# spotified [![Netlify Status](https://api.netlify.com/api/v1/badges/0b7a2a50-acc2-4c62-b81c-d0cd9bf3dc68/deploy-status)](https://app.netlify.com/sites/lucent-cannoli-db3bb3/deploys)
 
-(https://img.shields.io/badge/react-444444?style=for-the-badge&logo=react)
+![Github](https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white)
+![React](https://img.shields.io/badge/react-444444?style=for-the-badge&logo=react)
+![JavaScript](https://img.shields.io/badge/javascript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![TypeScript](https://img.shields.io/badge/typescript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![HTML](https://img.shields.io/badge/html-E34F26?style=for-the-badge&logo=html&logoColor=white)
+![CSS](https://img.shields.io/badge/css-1572B6?style=for-the-badge&logo=css&logoColor=white)
 
 - - -
 
