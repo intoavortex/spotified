@@ -1,6 +1,4 @@
-# spotified
-
-[![Netlify Status](https://api.netlify.com/api/v1/badges/0b7a2a50-acc2-4c62-b81c-d0cd9bf3dc68/deploy-status)](https://app.netlify.com/sites/lucent-cannoli-db3bb3/deploys)
+# spotified ![React](https://img.shields.io/badge/react-444444?style=for-the-badge&logo=react)[![Netlify Status](https://api.netlify.com/api/v1/badges/0b7a2a50-acc2-4c62-b81c-d0cd9bf3dc68/deploy-status)](https://app.netlify.com/sites/lucent-cannoli-db3bb3/deploys)
 
 - - -
 
