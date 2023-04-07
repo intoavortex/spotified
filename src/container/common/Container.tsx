@@ -52,8 +52,9 @@ export function Container() {
       <ContainerHeader />
       <ContentCotainer>
         <Contents>
-          <CoverThumbnailList title={'아니 플레이어 도대체'}/>
-          <CoverThumbnailList title={'어찌합니까?'}/>
+          <CoverThumbnailList title={'아 할 거 개많네 진짜'}/>
+          <CoverThumbnailList title={'재생목록1'}/>
+          <CoverThumbnailList title={'재생목록2'}/>
         </Contents>
       </ContentCotainer>
     </Wrap>
