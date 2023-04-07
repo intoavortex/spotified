@@ -1,12 +1,15 @@
 import styled from 'styled-components';
 import { AiFillHeart, AiOutlineHeart, AiFillStepForward, AiFillStepBackward } from 'react-icons/ai';
 import { BsPip } from 'react-icons/bs';
-import { RiVolumeUpFill, RiVolumeMuteFill, RiVolumeDownFill, RiPlayList2Fill } from 'react-icons/ri';
+import { RiVolumeUpFill, RiPlayList2Fill } from 'react-icons/ri';
+// import { RiVolumeUpFill, RiVolumeMuteFill, RiVolumeDownFill, RiPlayList2Fill } from 'react-icons/ri';
 import { BiFullscreen } from 'react-icons/bi';
 import { IoMdShuffle } from 'react-icons/io';
 import { MdOutlineLyrics } from 'react-icons/md';
-import { HiPlay, HiPause } from 'react-icons/hi';
-import { TbRepeatOff, TbRepeatOnce, TbRepeat, TbDevices } from 'react-icons/tb';
+// import { HiPlay, HiPause } from 'react-icons/hi';
+import { HiPlay } from 'react-icons/hi';
+// import { TbRepeatOff, TbRepeatOnce, TbRepeat, TbDevices } from 'react-icons/tb';
+import { TbRepeatOnce, TbRepeat, TbDevices } from 'react-icons/tb';
 import { useState } from 'react';
 
 
