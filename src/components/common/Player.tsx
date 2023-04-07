@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 import { AiFillHeart, AiOutlineHeart, AiFillStepForward, AiFillStepBackward } from 'react-icons/ai';
 import { BsPip } from 'react-icons/bs';
-import { RiVolumeUpFill, RiPlayList2Fill } from 'react-icons/ri';
 // import { RiVolumeUpFill, RiVolumeMuteFill, RiVolumeDownFill, RiPlayList2Fill } from 'react-icons/ri';
+import { RiVolumeUpFill, RiPlayList2Fill } from 'react-icons/ri';
 import { BiFullscreen } from 'react-icons/bi';
 import { IoMdShuffle } from 'react-icons/io';
 import { MdOutlineLyrics } from 'react-icons/md';
