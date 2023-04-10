@@ -1,8 +1,8 @@
 import styled from 'styled-components';
 import { AiFillHeart, AiOutlineHeart, AiFillStepForward, AiFillStepBackward } from 'react-icons/ai';
 import { BsPip } from 'react-icons/bs';
-// import { RiVolumeUpFill, RiVolumeMuteFill, RiVolumeDownFill, RiPlayList2Fill } from 'react-icons/ri';
-import { RiVolumeUpFill, RiPlayList2Fill } from 'react-icons/ri';
+import { RiVolumeUpFill, RiVolumeMuteFill, RiVolumeDownFill, RiPlayList2Fill } from 'react-icons/ri';
+// import { RiVolumeUpFill, RiPlayList2Fill } from 'react-icons/ri';
 import { BiFullscreen } from 'react-icons/bi';
 import { IoMdShuffle } from 'react-icons/io';
 import { MdOutlineLyrics } from 'react-icons/md';
@@ -95,6 +95,8 @@ function Player() {
   const [shuffle, setShuffle] = useState(false)
   // 반복재생
   const [repeat, setRepeat] = useState('off')
+  // 볼륨 조절
+  const [volume, setVolume] = useState('off')
 
   return (
     <Container>
@@ -150,11 +152,20 @@ function Player() {
         <Btn title='플레이리스트'><RiPlayList2Fill size='22' color='white'/></Btn>
         <Btn title='다른기기와 연결'><TbDevices size='22' color='white'/></Btn>
         <div>
-          <Btn title='볼륨'>
-            <RiVolumeUpFill size='22' color='white'/>
-            {/* <RiVolumeDownFill size='22' color='white'/>
-            <RiVolumeMuteFill size='22' color='white'/> */}
+          <Btn title='볼륨' onClick={() => {
+            if(volume === 'off'){setVolume('repeat')}
+            if(volume === 'repeat'){setVolume('one')}
+            if(volume === 'one'){setVolume('off')}
+          }}>
+            {volume === 'off' && <RiVolumeUpFill size='22' color='#fff'/>}
+            {volume === 'repeat' && <RiVolumeDownFill size='22' color='#fff'/>}
+            {repeat === 'one' && <RiVolumeMuteFill size='22' color='#fff'/>}
           </Btn>
+          {/* <Btn title='볼륨'>
+            <RiVolumeUpFill size='22' color='white'/>
+            <RiVolumeDownFill size='22' color='white'/>
+            <RiVolumeMuteFill size='22' color='white'/>
+          </Btn> */}
           <div>음량조절바</div>
         </div>
         <Btn title='전체화면'><BiFullscreen size='22' color='white'/></Btn>
