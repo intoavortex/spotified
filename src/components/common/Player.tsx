@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { AiFillHeart, AiOutlineHeart, AiFillStepForward, AiFillStepBackward } from 'react-icons/ai';
-import { BsPip } from 'react-icons/bs';
-import { RiVolumeUpFill, RiVolumeMuteFill, RiVolumeDownFill, RiPlayList2Fill } from 'react-icons/ri';
+import { BsPip, BsFillVolumeDownFill, BsFillVolumeOffFill, BsFillVolumeUpFill } from 'react-icons/bs';
+import { RiPlayList2Fill } from 'react-icons/ri';
 // import { RiVolumeUpFill, RiPlayList2Fill } from 'react-icons/ri';
 import { BiFullscreen } from 'react-icons/bi';
 import { IoMdShuffle } from 'react-icons/io';
@@ -96,7 +96,7 @@ function Player() {
   // 반복재생
   const [repeat, setRepeat] = useState('off')
   // 볼륨 조절
-  const [volume, setVolume] = useState('off')
+  const [volume, setVolume] = useState('max')
 
   return (
     <Container>
@@ -153,13 +153,13 @@ function Player() {
         <Btn title='다른기기와 연결'><TbDevices size='22' color='white'/></Btn>
         <div>
           <Btn title='볼륨' onClick={() => {
-            if(volume === 'off'){setVolume('repeat')}
-            if(volume === 'repeat'){setVolume('one')}
-            if(volume === 'one'){setVolume('off')}
+            if(volume === 'muted'){setVolume('slince')}
+            if(volume === 'slince'){setVolume('max')}
+            if(volume === 'max'){setVolume('muted')}
           }}>
-            {volume === 'off' && <RiVolumeUpFill size='22' color='#fff'/>}
-            {volume === 'repeat' && <RiVolumeDownFill size='22' color='#fff'/>}
-            {repeat === 'one' && <RiVolumeMuteFill size='22' color='#fff'/>}
+            {volume === 'max' && <BsFillVolumeUpFill size='22' color='#fff'/>}
+            {volume === 'slince' && <BsFillVolumeDownFill size='22' color='#fff'/>}
+            {volume === 'muted' && <BsFillVolumeOffFill size='22' color='#fff'/>}
           </Btn>
           {/* <Btn title='볼륨'>
             <RiVolumeUpFill size='22' color='white'/>
