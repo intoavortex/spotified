@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
 import { BiUser } from 'react-icons/bi';
-import { RxTriangleDown, RxExternalLink } from 'react-icons/rx';
+import { RxTriangleDown, RxExternalLink, RxTriangleUp } from 'react-icons/rx';
+import { useState } from 'react';
 
 const Container = styled.div`
   position:relative;
@@ -123,6 +124,7 @@ const Link = styled.a`
 
 
 function ContainerHeader() {
+  const [userInfo, setUserInfo] = useState(false);
   return (
     <Container>
       <FlexContainer>
@@ -134,27 +136,31 @@ function ContainerHeader() {
             <SlArrowRight color='white'/>
           </Btn>
         </HistoryBtnBox>
-        <UserBtn>
+        <UserBtn onClick={() => userInfo === false? setUserInfo(true) : setUserInfo(false)}>
           <UserIcon><BiUser size='18' color='white'/></UserIcon>
           <UserId>vouxx</UserId>
-          <ArrowIcon><RxTriangleDown size='20' color='white'/></ArrowIcon>
+          <ArrowIcon>
+            { userInfo === false? <RxTriangleDown size='20' color='white'/> : <RxTriangleUp size='20' color='white'/> }
+          </ArrowIcon>
         </UserBtn>
       </FlexContainer>
-      <MoreInfo>
-        <BtnGroup>
-          <Link href='' title='계정'>
-            <span>계정</span>
-            <RxExternalLink size='17'/>
-          </Link>
-          <Link href='' title='프로필'>
-            <span>프로필</span>
-          </Link>
-          <Link href='' title='설정'>
-            <span>설정</span>
-          </Link>
-        </BtnGroup>
-        <Link href='' title='로그아웃'>로그아웃</Link>
-      </MoreInfo>
+      { userInfo === true && 
+        <MoreInfo>
+          <BtnGroup>
+            <Link href='' title='계정'>
+              <span>계정</span>
+              <RxExternalLink size='17'/>
+            </Link>
+            <Link href='' title='프로필'>
+              <span>프로필</span>
+            </Link>
+            <Link href='' title='설정'>
+              <span>설정</span>
+            </Link>
+          </BtnGroup>
+          <Link href='' title='로그아웃'>로그아웃</Link>
+        </MoreInfo>
+      }
     </Container>
   );
 }

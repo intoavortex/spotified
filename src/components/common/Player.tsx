@@ -30,7 +30,33 @@ const Container = styled.div`
   padding:0 16px;
 
   > div{
-    width:calc(100% / 3);
+    width: 100%;
+    max-width: 528px;
+  }
+
+  > div:first-child + div{
+    width:100%;
+    max-width:704px;
+    margin-top:-4px;
+  }
+
+  button .svgIcon{
+    transition: all .3s ease;
+    fill:hsla(0,0%,100%,.7);
+  }
+  button:hover .svgIcon{
+    fill:#fff;
+  }
+
+  .playerBarBox:hover a,
+  .playerBarBox:hover .svgIcon{
+    transition: all .13s ease;
+  }
+  .playerBarBox:hover a{
+    background-color:#1ed760;
+  }
+  .playerBarBox:hover .svgIcon{
+    fill:#fff;
   }
 `
 
@@ -71,6 +97,13 @@ const BtnBox = styled.div`
   justify-content: center;
   align-items: center;
 `
+const BtnBoxRight = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: right;
+  align-items: center;
+`
 
 const LikeBtn = styled.button`
   height:40px;
@@ -87,6 +120,54 @@ const Btn = styled.button`
   border:none;
 `
 
+const PlayerBar = styled.div`
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width:100%;
+  margin-top:3px;
+`
+
+const PlayTime = styled.span`
+  color: #a7a7a7;
+  font-size: 11px;
+  min-width: 40px;
+`
+
+const BarOverBox = styled.div`
+  width:100%;
+  max-width:608px;
+  height:4px;
+  padding:4px 0;
+`
+
+const Barbox = styled.div`
+  width:100%;
+  max-width:608px;
+  height:4px;
+  background-color:hsla(0,0%,100%,.3);
+  border-radius: 2px;
+`
+
+const Bar = styled.a`
+  display:block;
+  width:50%;
+  height:100%;
+  border-radius: 2px;
+  background-color: #fff;
+`
+
+const VolumeBox = styled.div`
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width:100%;
+  max-width:125px;
+  margin-right:4px;
+`
+
 function Player() {
 
   // 좋아요
@@ -98,6 +179,8 @@ function Player() {
   // 볼륨 조절
   const [volume, setVolume] = useState('max')
 
+  // const [mouseHover, setMouseHover] = useState('hsla(0,0%,100%,.7)')
+
   return (
     <Container>
       {/* 여기 나중에 컴포넌트로 각각 분리함 */}
@@ -108,9 +191,9 @@ function Player() {
         </TitleBox>
         <BtnBox>
           <LikeBtn onClick={() => likes === false? setLikes(true) : setLikes(false)}>
-            { likes === true ? <AiFillHeart size='20' color='#1ed760'/> : <AiOutlineHeart size='20' color='white'/> }
+            { likes === true ? <AiFillHeart size='20' color='#1ed760'/> : <AiOutlineHeart size='20' className={'svgIcon'}/> }
           </LikeBtn>
-          <LikeBtn><BsPip size='20' color='white'/></LikeBtn>
+          <LikeBtn><BsPip size='20' className={'svgIcon'}/></LikeBtn>
         </BtnBox>
       </NowPlaying>
 
@@ -118,14 +201,14 @@ function Player() {
       <div>
         <BtnBox>
           <Btn title='무작위' onClick={() => shuffle === false? setShuffle(true) : setShuffle(false)}>
-            { shuffle === true ? <IoMdShuffle size='22' color='#1ed760'/> : <IoMdShuffle size='22' color='white'/> }
+            { shuffle === true ? <IoMdShuffle size='22' color='#1ed760'/> : <IoMdShuffle size='22' className={'svgIcon'}/> }
           </Btn>
-          <Btn title='이전곡'><AiFillStepBackward size='22' color='white'/></Btn>
+          <Btn title='이전곡'><AiFillStepBackward size='22' className={'svgIcon'}/></Btn>
           <Btn title='재생/일시정지'>
-            <HiPlay size='38' color='white'/>
-            {/* <HiPause size='38' color='white'/> */}
+            <HiPlay size='40' color='#fff'/>
+            {/* <HiPause size='38' color={mouseHover}/> */}
           </Btn>
-          <Btn title='다음곡'><AiFillStepForward size='22' color='white'/></Btn>
+          <Btn title='다음곡'><AiFillStepForward size='22' className={'svgIcon'}/></Btn>
 
           <Btn title='반복' onClick={() => {
             if(repeat === 'off'){setRepeat('repeat')}
@@ -137,39 +220,43 @@ function Player() {
             {repeat === 'one' && <TbRepeatOnce size='22' color='#1ed760'/>}
           </Btn>
         </BtnBox>
-        <div>
-          <span>0:00</span>
-          <div>
-            <div>재생바</div>
-          </div>
-          <span>5:26</span>
-        </div>
+        <PlayerBar>
+          <PlayTime>0:00</PlayTime>
+          <BarOverBox className='playerBarBox'>
+            <Barbox>
+              <Bar></Bar>
+            </Barbox>
+          </BarOverBox>
+          <PlayTime>5:26</PlayTime>
+        </PlayerBar>
       </div>
       
       {/* 여기 나중에 컴포넌트로 각각 분리함 */}
-      <div>
-        <Btn title='가사'><MdOutlineLyrics size='22' color='white'/></Btn>
-        <Btn title='플레이리스트'><RiPlayList2Fill size='22' color='white'/></Btn>
-        <Btn title='다른기기와 연결'><TbDevices size='22' color='white'/></Btn>
-        <div>
+      <BtnBoxRight>
+        <Btn title='가사'><MdOutlineLyrics size='20' className={'svgIcon'}/></Btn>
+        <Btn title='플레이리스트'><RiPlayList2Fill size='20' className={'svgIcon'}/></Btn>
+        <Btn title='다른기기와 연결'><TbDevices size='20' className={'svgIcon'}/></Btn>
+        <VolumeBox className='playerBarBox'>
           <Btn title='볼륨' onClick={() => {
             if(volume === 'muted'){setVolume('slince')}
             if(volume === 'slince'){setVolume('max')}
             if(volume === 'max'){setVolume('muted')}
           }}>
-            {volume === 'max' && <BsFillVolumeUpFill size='22' color='#fff'/>}
-            {volume === 'slince' && <BsFillVolumeDownFill size='22' color='#fff'/>}
-            {volume === 'muted' && <BsFillVolumeOffFill size='22' color='#fff'/>}
+            {volume === 'max' && <BsFillVolumeUpFill size='20' className={'svgIcon'}/>}
+            {volume === 'slince' && <BsFillVolumeDownFill size='20' className={'svgIcon'}/>}
+            {volume === 'muted' && <BsFillVolumeOffFill size='20' className={'svgIcon'}/>}
           </Btn>
           {/* <Btn title='볼륨'>
-            <RiVolumeUpFill size='22' color='white'/>
-            <RiVolumeDownFill size='22' color='white'/>
-            <RiVolumeMuteFill size='22' color='white'/>
+            <RiVolumeUpFill size='20' color={mouseHover}/>
+            <RiVolumeDownFill size='20' color={mouseHover}/>
+            <RiVolumeMuteFill size='20' color={mouseHover}/>
           </Btn> */}
-          <div>음량조절바</div>
-        </div>
-        <Btn title='전체화면'><BiFullscreen size='22' color='white'/></Btn>
-      </div>
+          <Barbox>
+            <Bar></Bar>
+          </Barbox>
+        </VolumeBox>
+        <Btn title='전체화면'><BiFullscreen size='20' className={'svgIcon'}/></Btn>
+      </BtnBoxRight>
     </Container>
   );
 }
