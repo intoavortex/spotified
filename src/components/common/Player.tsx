@@ -180,17 +180,17 @@ function Player() {
   // mouseOver
   // const [mouseHover, setMouseHover] = useState('hsla(0,0%,100%,.7)')
 
-  // const ArtistName = await ArtistInfo('4Z8W4fKeB5YxbusRsdQVPb');
-  // console.log(ArtistName); 
-  
+  const [playerState, setPlayerState] = useState({});
+
   useEffect(() => {
     async function ArtistApi(){
-      const ArtistName = await ArtistInfo('4Z8W4fKeB5YxbusRsdQVPb');
-      console.log(ArtistName.name); 
+      const PlayerData = await ArtistInfo('4Z8W4fKeB5YxbusRsdQVPb');
+      setPlayerState(PlayerData);
     }
     ArtistApi();
   }, []);
-
+  
+  // console.log(playerState.name)
   return (
     <Container>
       {/* 여기 나중에 컴포넌트로 각각 분리함 */}
@@ -198,7 +198,7 @@ function Player() {
         <TitleBox>
           <Title>PretenderPretenderPretenderPretenderPretenderPretender</Title>
           <Artist>OFFICIAL HIGE DANDISM</Artist>
-          {/* <Artist>{ArtistName}</Artist> */}
+          {/* <Artist>{playerState.name}</Artist> */}
         </TitleBox>
         <BtnBox>
           <LikeBtn onClick={() => likes === false? setLikes(true) : setLikes(false)}>

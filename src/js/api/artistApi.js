@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default async function ArtistInfo (data) {
   const url = `https://api.spotify.com/v1/artists/${data}`;
-  const auth = 'BQCRMaexsSY6GQd3ZRPgQcnkndHeyZNvVr4gmpXGUuAmF-wQo6PbJ8pMB0C_pruBmMvCzZCSeDit2ew1Kz3w6waOMkeQ9wne7zw_I3uUGjh3NXFiaab_';
+  const auth = 'BQAEi3-tR8sbzeZsC3G9VMW2P7ZcXeGmTp87_Ib_ZaddolWmX-4e5eB3DEVkLjhIMGS-JKAY2KmXi3ZogxhU5MTsnXX9wQ6Qjt4HmRwaaK5Huw7PIQs1';
   const token = `Bearer ${auth}`;
 
   try {
