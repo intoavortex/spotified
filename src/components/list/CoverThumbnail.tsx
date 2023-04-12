@@ -87,8 +87,9 @@ const Desc = styled.a`
   }
 `
 
-
 function CoverThumbnail() {
+
+  
   return (
     <Container>
       <ImgBox>

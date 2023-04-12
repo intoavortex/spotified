@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { MdHomeFilled } from 'react-icons/md';
 // import {MdHomeFilled } from '@react-md/icon';
+import testApi from '../../js/api/app'
 
 import logo from '../../logo.svg';
 // import logo from '../../static/img/logo.png';
@@ -59,6 +60,7 @@ const AlbumCover = styled.div`
 
 
 function Header() {
+  console.log(testApi());
   return (
     <Container>
       <div>

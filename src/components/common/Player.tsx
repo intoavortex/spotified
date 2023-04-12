@@ -1,16 +1,15 @@
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import ArtistInfo from '../../js/api/artistApi'
+
 import { AiFillHeart, AiOutlineHeart, AiFillStepForward, AiFillStepBackward } from 'react-icons/ai';
 import { BsPip, BsFillVolumeDownFill, BsFillVolumeOffFill, BsFillVolumeUpFill } from 'react-icons/bs';
 import { RiPlayList2Fill } from 'react-icons/ri';
-// import { RiVolumeUpFill, RiPlayList2Fill } from 'react-icons/ri';
 import { BiFullscreen } from 'react-icons/bi';
 import { IoMdShuffle } from 'react-icons/io';
 import { MdOutlineLyrics } from 'react-icons/md';
-// import { HiPlay, HiPause } from 'react-icons/hi';
 import { HiPlay } from 'react-icons/hi';
-// import { TbRepeatOff, TbRepeatOnce, TbRepeat, TbDevices } from 'react-icons/tb';
 import { TbRepeatOnce, TbRepeat, TbDevices } from 'react-icons/tb';
-import { useState } from 'react';
 
 
 const Container = styled.div`
@@ -178,8 +177,19 @@ function Player() {
   const [repeat, setRepeat] = useState('off')
   // 볼륨 조절
   const [volume, setVolume] = useState('max')
-
+  // mouseOver
   // const [mouseHover, setMouseHover] = useState('hsla(0,0%,100%,.7)')
+
+  // const ArtistName = await ArtistInfo('4Z8W4fKeB5YxbusRsdQVPb');
+  // console.log(ArtistName); 
+  
+  useEffect(() => {
+    async function ArtistApi(){
+      const ArtistName = await ArtistInfo('4Z8W4fKeB5YxbusRsdQVPb');
+      console.log(ArtistName.name); 
+    }
+    ArtistApi();
+  }, []);
 
   return (
     <Container>
@@ -188,6 +198,7 @@ function Player() {
         <TitleBox>
           <Title>PretenderPretenderPretenderPretenderPretenderPretender</Title>
           <Artist>OFFICIAL HIGE DANDISM</Artist>
+          {/* <Artist>{ArtistName}</Artist> */}
         </TitleBox>
         <BtnBox>
           <LikeBtn onClick={() => likes === false? setLikes(true) : setLikes(false)}>
