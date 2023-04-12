@@ -80,7 +80,7 @@ function Header() {
           </Menu>
           <Line />
           <Menu>
-            <MenuBtn>내가 만든 플레이리스트</MenuBtn>
+            <MenuBtn>내가 만든 플레이리스트ty</MenuBtn>
           </Menu>
         </MenuGroup>
        
