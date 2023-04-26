@@ -1,12 +1,11 @@
+import { useEffect, useState } from 'react';
+
 import styled from 'styled-components';
 import { MdHomeFilled } from 'react-icons/md';
-// import {MdHomeFilled } from '@react-md/icon';
-import testApi from '../../js/api/app'
 
 import logo from '../../logo.svg';
-// import logo from '../../static/img/logo.png';
-import albumImg from '../../static/img/test.jpeg';
-
+import TrackInfo from '../../js/api/trackApi'
+import testApi from '../../js/api/app'
 
 const Container = styled.div`
   width:400px;
@@ -61,6 +60,17 @@ const AlbumCover = styled.div`
 
 function Header() {
   console.log(testApi());
+
+  const [albumImg, setAlbumImg] = useState<string>('');
+
+  useEffect(() => {
+    async function TrackApi(){
+      const PlayerData = await TrackInfo('7zKieV1uXBhucwmYM4sCzW');
+      setAlbumImg(PlayerData.album.images[0].url);
+    }
+    TrackApi();
+  }, []);
+
   return (
     <Container>
       <div>

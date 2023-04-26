@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import ArtistInfo from '../../js/api/artistApi'
 
 import { AiFillHeart, AiOutlineHeart, AiFillStepForward, AiFillStepBackward } from 'react-icons/ai';
 import { BsPip, BsFillVolumeDownFill, BsFillVolumeOffFill, BsFillVolumeUpFill } from 'react-icons/bs';
@@ -10,10 +11,6 @@ import { MdOutlineLyrics } from 'react-icons/md';
 import { HiPlay } from 'react-icons/hi';
 import { TbRepeatOnce, TbRepeat, TbDevices } from 'react-icons/tb';
 
-import TrackInfo from '../../js/api/trackApi'
-// import PlayTrackInfo from '../../js/api/playTrackApi'
-import RecentlyTrackInfo from '../../js/api/recentlyPlay'
-import ArtistInfo from '../../js/api/artistApi'
 
 const Container = styled.div`
   overflow:hidden;
@@ -193,49 +190,14 @@ function Player() {
     ArtistApi();
   }, []);
   
-  // console.log(playerState)
-
-
-  const [artistName, setArtistName] = useState<string>('');
-  const [trackName, setTrackName] = useState<string>('');
-  const [playTrack, setPlayTrack] = useState<string>('');
-
-  useEffect(() => {
-    
-    async function TrackApi(){
-      const PlayerData = await TrackInfo('7zKieV1uXBhucwmYM4sCzW');
-      setArtistName(PlayerData.artists[0].name);
-      setTrackName(PlayerData.name);
-      setPlayTrack(PlayerData.uri)
-      // console.log(PlayerData)
-    }
-    TrackApi();
-
-    // async function RecentlyTrackApi(){
-    //   const RecentPlay = await RecentlyTrackInfo();
-    //   // setArtistName(RecentPlay.artists[0].name);
-    //   // setTrackName(RecentPlay.name);
-    //   // setPlayTrack(RecentPlay.uri)
-    //   console.log(RecentPlay)
-    // }
-    // RecentlyTrackApi();
-
-    // async function PlayTrackApi(){
-    //   const Player = await PlayTrackInfo('0d1841b0976bae2a3a310dd74c0f3df354899bc8');
-    //   // const Player = await PlayTrackInfo('spotify:album:5ht7ItJgpBH7W6vJ5BqpPr');
-    //   // const Player = await PlayTrackInfo();
-    //   console.log(Player)
-    // }
-    // PlayTrackApi();
-  }, []);
-  
+  console.log(playerState)
   return (
     <Container>
       {/* 여기 나중에 컴포넌트로 각각 분리함 */}
       <NowPlaying>
         <TitleBox>
-          <Title>{trackName}</Title>
-          <Artist>{artistName}</Artist>
+          <Title>PretenderPretenderPretenderPretenderPretenderPretender</Title>
+          <Artist>{playerState}</Artist>
         </TitleBox>
         <BtnBox>
           <LikeBtn onClick={() => likes === false? setLikes(true) : setLikes(false)}>

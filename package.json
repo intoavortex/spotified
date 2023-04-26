@@ -54,5 +54,8 @@
   },
   "devDependencies": {
     "@types/styled-components": "^5.1.26"
+  },
+  "resolutions": {
+    "@types/react": "^18.2.0"
   }
 }
