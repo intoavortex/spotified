@@ -5,7 +5,7 @@ import { MdHomeFilled } from 'react-icons/md';
 
 import logo from '../../logo.svg';
 import TrackInfo from '../../js/api/trackApi'
-import testApi from '../../js/api/app'
+// import testApi from '../../js/api/app'
 
 const Container = styled.div`
   width:400px;
@@ -59,7 +59,7 @@ const AlbumCover = styled.div`
 
 
 function Header() {
-  console.log(testApi());
+  // console.log(testApi());
 
   const [albumImg, setAlbumImg] = useState<string>('');
 

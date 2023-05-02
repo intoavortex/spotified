@@ -7,11 +7,11 @@ import { RiPlayList2Fill } from 'react-icons/ri';
 import { BiFullscreen } from 'react-icons/bi';
 import { IoMdShuffle } from 'react-icons/io';
 import { MdOutlineLyrics } from 'react-icons/md';
-import { HiPlay } from 'react-icons/hi';
+import { HiPlay, HiPause } from 'react-icons/hi';
 import { TbRepeatOnce, TbRepeat, TbDevices } from 'react-icons/tb';
 
 import TrackInfo from '../../js/api/trackApi'
-// import PlayTrackInfo from '../../js/api/playTrackApi'
+import PlayTrackInfo from '../../js/api/playTrackApi'
 import RecentlyTrackInfo from '../../js/api/recentlyPlay'
 import ArtistInfo from '../../js/api/artistApi'
 
@@ -185,13 +185,13 @@ function Player() {
 
   const [playerState, setPlayerState] = useState<string>('');
 
-  useEffect(() => {
-    async function ArtistApi(){
-      const PlayerData = await ArtistInfo('4xI10jfncyX27yytrVJ2Ar');
-      setPlayerState(PlayerData.name);
-    }
-    ArtistApi();
-  }, []);
+  // useEffect(() => {
+  //   async function ArtistApi(){
+  //     const PlayerData = await ArtistInfo('4xI10jfncyX27yytrVJ2Ar');
+  //     setPlayerState(PlayerData.name);
+  //   }
+  //   ArtistApi();
+  // }, []);
   
   // console.log(playerState)
 
@@ -199,6 +199,7 @@ function Player() {
   const [artistName, setArtistName] = useState<string>('');
   const [trackName, setTrackName] = useState<string>('');
   const [playTrack, setPlayTrack] = useState<string>('');
+  const [playState, setPlayState] = useState<Boolean>(false);
 
   useEffect(() => {
     
@@ -207,27 +208,29 @@ function Player() {
       setArtistName(PlayerData.artists[0].name);
       setTrackName(PlayerData.name);
       setPlayTrack(PlayerData.uri)
-      // console.log(PlayerData)
+      console.log(PlayerData)
     }
     TrackApi();
 
-    // async function RecentlyTrackApi(){
-    //   const RecentPlay = await RecentlyTrackInfo();
-    //   // setArtistName(RecentPlay.artists[0].name);
-    //   // setTrackName(RecentPlay.name);
-    //   // setPlayTrack(RecentPlay.uri)
-    //   console.log(RecentPlay)
-    // }
-    // RecentlyTrackApi();
+    async function RecentlyTrackApi(){
+      const RecentPlay = await RecentlyTrackInfo();
+      // setArtistName(RecentPlay.artists[0].name);
+      // setTrackName(RecentPlay.name);
+      setPlayTrack(RecentPlay.items[0].track.href)
+      // console.log(typeof RecentPlay.items[0].track.href)
+      console.log(RecentPlay)
+      // console.log(RecentPlay.items[0].track.href);
+      
+    }
+    RecentlyTrackApi();
 
-    // async function PlayTrackApi(){
-    //   const Player = await PlayTrackInfo('0d1841b0976bae2a3a310dd74c0f3df354899bc8');
-    //   // const Player = await PlayTrackInfo('spotify:album:5ht7ItJgpBH7W6vJ5BqpPr');
-    //   // const Player = await PlayTrackInfo();
-    //   console.log(Player)
-    // }
-    // PlayTrackApi();
+    
   }, []);
+
+  async function PlayTrackApi(){
+    await PlayTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ');
+    playState === false ? setPlayState(true):setPlayState(false);
+  }
   
   return (
     <Container>
@@ -252,9 +255,11 @@ function Player() {
             { shuffle === true ? <IoMdShuffle size='22' color='#1ed760'/> : <IoMdShuffle size='22' className={'svgIcon'}/> }
           </Btn>
           <Btn title='이전곡'><AiFillStepBackward size='22' className={'svgIcon'}/></Btn>
-          <Btn title='재생/일시정지'>
-            <HiPlay size='40' color='#fff'/>
-            {/* <HiPause size='38' color={mouseHover}/> */}
+          <Btn title='재생/일시정지' onClick={() => PlayTrackApi()}>
+            {playState === false ? 
+              <HiPlay size='40' color='#fff'/> :
+              <HiPause size='40' color='#fff'/> 
+            }
           </Btn>
           <Btn title='다음곡'><AiFillStepForward size='22' className={'svgIcon'}/></Btn>
 

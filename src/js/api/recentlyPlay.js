@@ -1,12 +1,20 @@
 import axios from "axios";
 
-export default async function RecentlyTrackInfo () {
-  const url = `https://api.spotify.com/v1/me/player/recently-played`;
-  // const url = `https://api.spotify.com/v1/me/player/recently-played&limit=10&after=${trackId}`;
-  const auth = 'BQBrLz5B6rORmr-sZdP8ARsdRAbhpvE2ng_WCQZK9kRg3ip_5ElMxouk2i3mz1OsQV2Z_MtQqmjOEjGgCULQ1ODoUSxZ7RCwaefP3RRNXZ0_Th_HITaf';
-  const token = `Bearer ${auth}`; 
+async function getToken () {
+  const url = `http://localhost:8888/access-token`;
+  try {
+    const res =  await axios.get(url);
 
-  // console.log(trackId)
+    return res.data;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+export default async function RecentlyTrackInfo () {
+  const accessToken = await getToken();
+  const url = `https://api.spotify.com/v1/me/player/recently-played`;
+  const token = `Bearer ${accessToken.access_token}`; 
 
   try {
     const res =  await axios.get(url, {
