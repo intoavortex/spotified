@@ -1,9 +1,9 @@
 import axios from "axios";
-import getToken from "./getToken";
+import getToken from './getToken'
 
-export default async function RecentlyTrackInfo () {
+export default async function getPlayState () {
   const accessToken = await getToken();
-  const url = `https://api.spotify.com/v1/me/player/recently-played`;
+  const url = `https://api.spotify.com/v1/me/player`;
   const token = `Bearer ${accessToken.access_token}`; 
 
   try {
@@ -15,6 +15,6 @@ export default async function RecentlyTrackInfo () {
   
     return res.data;
   } catch (err) {
-    alert('tq');
+    alert(err);
   }
 }

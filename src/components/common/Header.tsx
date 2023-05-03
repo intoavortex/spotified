@@ -4,8 +4,10 @@ import styled from 'styled-components';
 import { MdHomeFilled } from 'react-icons/md';
 
 import logo from '../../logo.svg';
-import TrackInfo from '../../js/api/trackApi'
+// import TrackInfo from '../../js/api/trackApi'
 // import testApi from '../../js/api/app'
+import getPlayState from '../../js/api/getPlayState';
+
 
 const Container = styled.div`
   width:400px;
@@ -59,16 +61,15 @@ const AlbumCover = styled.div`
 
 
 function Header() {
-  // console.log(testApi());
-
   const [albumImg, setAlbumImg] = useState<string>('');
-
+  
   useEffect(() => {
-    async function TrackApi(){
-      const PlayerData = await TrackInfo('7zKieV1uXBhucwmYM4sCzW');
-      setAlbumImg(PlayerData.album.images[0].url);
+    // TODO: Player.tsx에도 있음 하나로 통합시키는 게 맞음
+    async function getPlayStateApi(){
+      const playStateInfo = await getPlayState();
+      setAlbumImg(playStateInfo.item.album.images[0].url);
     }
-    TrackApi();
+    getPlayStateApi();
   }, []);
 
   return (

@@ -136,6 +136,7 @@ function ContainerHeader() {
             <SlArrowRight color='white'/>
           </Btn>
         </HistoryBtnBox>
+        {/* <UserBtn href='http://localhost:8888/login' target='_blank'> */}
         <UserBtn onClick={() => userInfo === false? setUserInfo(true) : setUserInfo(false)}>
           <UserIcon><BiUser size='18' color='white'/></UserIcon>
           <UserId>vouxx</UserId>
@@ -147,12 +148,14 @@ function ContainerHeader() {
       { userInfo === true && 
         <MoreInfo>
           <BtnGroup>
-            <Link href='' title='계정'>
-              <span>계정</span>
+            <Link href='http://localhost:8888/login' target='_blank' title='계정'>
+              {/* <span>계정</span> */}
+              <span>로그인</span>
               <RxExternalLink size='17'/>
             </Link>
-            <Link href='' title='프로필'>
-              <span>프로필</span>
+            <Link href='http://localhost:8888/access-token' target='_blank' title='프로필'>
+              {/* <span>프로필</span> */}
+              <span>토큰 발급</span>
             </Link>
             <Link href='' title='설정'>
               <span>설정</span>

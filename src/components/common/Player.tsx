@@ -10,10 +10,10 @@ import { MdOutlineLyrics } from 'react-icons/md';
 import { HiPlay, HiPause } from 'react-icons/hi';
 import { TbRepeatOnce, TbRepeat, TbDevices } from 'react-icons/tb';
 
-import TrackInfo from '../../js/api/trackApi'
-import PlayTrackInfo from '../../js/api/playTrackApi'
-import RecentlyTrackInfo from '../../js/api/recentlyPlay'
-import ArtistInfo from '../../js/api/artistApi'
+// import TrackInfo from '../../js/api/trackApi'
+import { PlayTrackInfo, PauseTrackInfo } from '../../js/api/playPauseApi'
+// import RecentlyTrackInfo from '../../js/api/recentlyPlay'
+import getPlayState from '../../js/api/getPlayState';
 
 const Container = styled.div`
   overflow:hidden;
@@ -150,14 +150,16 @@ const Barbox = styled.div`
   height:4px;
   background-color:hsla(0,0%,100%,.3);
   border-radius: 2px;
+  overflow:hidden;
 `
-
-const Bar = styled.a`
+// styled-components에서 사용할 변수 타입 지정해주기
+const Bar = styled.a<any>`
   display:block;
-  width:50%;
+  width:0;
   height:100%;
   border-radius: 2px;
   background-color: #fff;
+  /* transform:translateX(-100%); */
 `
 
 const VolumeBox = styled.div`
@@ -185,51 +187,98 @@ function Player() {
 
   const [playerState, setPlayerState] = useState<string>('');
 
-  // useEffect(() => {
-  //   async function ArtistApi(){
-  //     const PlayerData = await ArtistInfo('4xI10jfncyX27yytrVJ2Ar');
-  //     setPlayerState(PlayerData.name);
-  //   }
-  //   ArtistApi();
-  // }, []);
-  
-  // console.log(playerState)
-
-
   const [artistName, setArtistName] = useState<string>('');
   const [trackName, setTrackName] = useState<string>('');
   const [playTrack, setPlayTrack] = useState<string>('');
   const [playState, setPlayState] = useState<Boolean>(false);
+  const [barState, setBarState] = useState<number>(0);
 
+  
   useEffect(() => {
     
-    async function TrackApi(){
-      const PlayerData = await TrackInfo('7zKieV1uXBhucwmYM4sCzW');
-      setArtistName(PlayerData.artists[0].name);
-      setTrackName(PlayerData.name);
-      setPlayTrack(PlayerData.uri)
-      console.log(PlayerData)
-    }
-    TrackApi();
+    // async function TrackApi(){
+    //   const PlayerData = await TrackInfo('7zKieV1uXBhucwmYM4sCzW');
+    //   setArtistName(PlayerData.artists[0].name);
+    //   setTrackName(PlayerData.name);
+    //   setPlayTrack(PlayerData.uri)
+    //   // console.log(PlayerData)
+    // }
+    // TrackApi();
 
-    async function RecentlyTrackApi(){
-      const RecentPlay = await RecentlyTrackInfo();
-      // setArtistName(RecentPlay.artists[0].name);
-      // setTrackName(RecentPlay.name);
-      setPlayTrack(RecentPlay.items[0].track.href)
-      // console.log(typeof RecentPlay.items[0].track.href)
-      console.log(RecentPlay)
-      // console.log(RecentPlay.items[0].track.href);
+    // async function RecentlyTrackApi(){
+    //   const RecentPlay = await RecentlyTrackInfo();
+    //   // setArtistName(RecentPlay.artists[0].name);
+    //   // setTrackName(RecentPlay.name);
+    //   setPlayTrack(RecentPlay.items[0].track.href)
+    //   // console.log(typeof RecentPlay.items[0].track.href)
+    //   // console.log(RecentPlay)
+    //   // console.log(RecentPlay.items[0].track.href);
       
+    // }
+    // RecentlyTrackApi();
+
+    // TODO: Header.tsx에도 있음 하나로 통합시키는 게 맞음
+    async function getPlayStateApi(){
+      const playStateInfo = await getPlayState();
+      const playChk = playStateInfo.is_playing;
+      playChk === true? setPlayState(true) : setPlayState(false);
+
+      console.log(playStateInfo);
+      
+
+      // setArtistName(playStateInfo.item.artists[0].name);
+      setTrackName(playStateInfo.item.name);
+      setPlayTrack(playStateInfo.item.album.uri)
+
     }
-    RecentlyTrackApi();
+    getPlayStateApi();
 
     
   }, []);
 
+  let barWidth:any = 0;
+  async function getPlayStateApi(){
+    const playStateInfo = await getPlayState();
+    const duration = playStateInfo.item.duration_ms;
+    const progress = playStateInfo.progress_ms;
+    let all = progress / duration
+
+    barWidth = all * 100;
+    ;
+  }
+  
+  setInterval(() => {
+    getPlayStateApi();
+    console.log(barWidth);
+    // setBarState(barWidth)
+  }, 1000)
+
+  // useEffect(() => {
+  //   console.log('test');
+    
+  // }, []);
+
   async function PlayTrackApi(){
-    await PlayTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ');
-    playState === false ? setPlayState(true):setPlayState(false);
+    const playStateInfo = await getPlayState();
+    const nowPlayState = playStateInfo.is_playing;
+    if(nowPlayState === true) {
+      if(playState === false){
+        setPlayState(true);
+        await PlayTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ', playStateInfo.progress_ms, playStateInfo.item.track_number);
+      }else{
+        setPlayState(false);
+        await PauseTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ', playStateInfo.progress_ms, playStateInfo.item.track_number);
+      }
+    }else{
+      if(playState === false){
+        setPlayState(true);
+        await PlayTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ', playStateInfo.progress_ms, playStateInfo.item.track_number);
+      }else{
+        setPlayState(false);
+        await PauseTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ', playStateInfo.progress_ms, playStateInfo.item.track_number);
+      }
+    }
+    
   }
   
   return (
@@ -277,7 +326,8 @@ function Player() {
           <PlayTime>0:00</PlayTime>
           <BarOverBox className='playerBarBox'>
             <Barbox>
-              <Bar></Bar>
+              {/* <Bar barWidth={barWidth}></Bar> */}
+              <Bar style={{width:barWidth + '%'}}></Bar>
             </Barbox>
           </BarOverBox>
           <PlayTime>5:26</PlayTime>
