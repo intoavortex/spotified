@@ -7,24 +7,22 @@ import { BsPip, BsFillVolumeDownFill, BsFillVolumeOffFill, BsFillVolumeUpFill } 
 import { RiPlayList2Fill } from 'react-icons/ri';
 import { BiFullscreen } from 'react-icons/bi';
 import { IoMdShuffle } from 'react-icons/io';
-import { MdOutlineLyrics } from 'react-icons/md';
+import { MdOutlineLyrics, MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 import { HiPlay, HiPause } from 'react-icons/hi';
 import { TbRepeatOnce, TbRepeat, TbDevices } from 'react-icons/tb';
 
-// import TrackInfo from '../../js/api/trackApi'
-// import { PlayTrackInfo, PauseTrackInfo } from '../../js/api/playPauseApi'
-// import RecentlyTrackInfo from '../../js/api/recentlyPlay'
-// import getPlayState from '../../js/api/getPlayState';
 import getTokenApi from '../../js/api/getToken';
 
 const Container = styled.div`
-  overflow:hidden;
+  position:relative;
+  /* overflow:hidden; */
   width:100%;
   height:90px;
   background-color:#181818;
   border-top:1px solid #282828;
   box-sizing: border-box;
   color:#fff;
+  z-index:10;
 
   display:flex;
   flex-direction:row;
@@ -51,6 +49,13 @@ const Container = styled.div`
   button:hover .svgIcon{
     fill:#fff;
   }
+  button .svgStrokeIcon{
+    transition: all .3s ease;
+    stroke:hsla(0,0%,100%,.7);
+  }
+  button:hover .svgStrokeIcon{
+    stroke:#fff;
+  }
 
   .playerBarBox:hover a,
   .playerBarBox:hover .svgIcon{
@@ -72,13 +77,14 @@ const NowPlaying = styled.div`
 `
 
 const TitleBox = styled.div`
+  margin-left: 14px;
   margin-right: 14px;
   text-align: left;
 `
 
 const Title = styled.span`
   display: block;
-  max-width:380px;
+  max-width:310px;
   font-size: 14px;
   line-height:22px;
   text-align: left;
@@ -87,7 +93,7 @@ const Title = styled.span`
 
 const Artist = styled.span`
   display: block;
-  max-width:380px;
+  max-width:310px;
   font-size: 11px;
   line-height: 18px;
   text-align: left;
@@ -175,7 +181,87 @@ const VolumeBox = styled.div`
   margin-right:4px;
 `
 
-function Player() {
+interface StyledType {
+  isTopActive: boolean
+}
+
+let TopAlbumCover = styled.div<StyledType>`
+  width: 400px;
+  position: absolute;
+  left:${(props) => (props.isTopActive === true ? '-400px' : '0')};
+  bottom:90px;
+  z-index:1;
+  transition:all .3s ease;
+
+  img{width:100%;}
+`
+let LeftAlbumCover = styled.a<StyledType>`
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
+  overflow: hidden;
+  position:${(props) => (props.isTopActive === true ? 'relative' : 'absolute')};
+  left:${(props) => (props.isTopActive === true ? '0' : '-400px')};
+  bottom: 0;
+  z-index:1;
+  transition:all .3s ease;
+  cursor: pointer;
+
+  img{width:100%;}
+  &:hover a{
+    opacity: 1;
+  }
+`
+
+const TopCoverBtn = styled.a<StyledType>`
+  position: absolute;
+  right:0;
+  top:0;
+  width:30px; height:30px;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  margin-right:10px;
+  margin-top:10px;
+  border:none;
+  border-radius: 50%;
+  background-color: black;
+  opacity: 0.5;
+  cursor: pointer;
+  transition:all .3s ease;
+
+  &:hover{
+    opacity: 1;
+  }
+`
+
+const LeftCoverBtn = styled.a<StyledType>`
+  position: absolute;
+  right:0;
+  top:0;
+  width:24px; height:24px;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  margin-right:5px;
+  margin-top:5px;
+  border:none;
+  border-radius: 50%;
+  background-color: black;
+  opacity: 0;
+  cursor: pointer;
+  transition:all .3s ease;
+
+  &:hover{
+    opacity: 1;
+    width:26px; height:26px;
+    margin-right:7px;
+    margin-top:7px;
+  }
+`
+
+
+export default function Player() {
 
   // 좋아요
   const [likes, setLikes] = useState(false)
@@ -190,10 +276,21 @@ function Player() {
 
   const [artistName, setArtistName] = useState<string>('');
   const [trackName, setTrackName] = useState<string>('');
+  const [albumCover, setAlbumCover] = useState<string>('');
   const [playState, setPlayState] = useState<Boolean>(false);
   const [duration, setDuration] = useState<{min:number, sec:number}>({min:0, sec:0});
+  const [minCover, setMinCover] = useState<any>(false);
 
+  /* sdk 초기 셋팅 */
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://sdk.scdn.co/spotify-player.js';
+    script.async = true;
   
+    document.body.appendChild(script);
+  }, [])
+  
+
   useEffect(() => {
     /* 토큰 또 가져옴 또큰임 걍 */
     let tokenStr = '';
@@ -205,13 +302,6 @@ function Player() {
       tokenBearerStr = `Bearer ${getToken.access_token}`; 
     }
     getToken();
-    
-    /* sdk 초기 셋팅 */
-    const script = document.createElement('script');
-    script.src = 'https://sdk.scdn.co/spotify-player.js';
-    script.async = true;
-  
-    document.body.appendChild(script);
   
     window.onSpotifyWebPlaybackSDKReady = () => {
       const spotPlayer = new window.Spotify.Player({
@@ -249,8 +339,12 @@ function Player() {
           return;
         }
         state.paused === true? setPlayState(false) : setPlayState(true); 
-        setTrackName(state.track_window.current_track.name);
-        setArtistName(state.track_window.current_track.artists[0].name);
+
+        console.log(state);
+        
+        setTrackName(state.track_window.current_track.name === null? '':state.track_window.current_track.name);
+        setArtistName(state.track_window.current_track.artists[0].name === null? '':state.track_window.current_track.artists[0].name);
+        setAlbumCover(state.track_window.current_track.album.images[2].url === null? '':state.track_window.current_track.album.images[2].url);
         setDuration({
           min: Math.floor((state.duration / 1000) / 60),
           sec: Math.floor((state.duration / 1000) % 60)
@@ -265,10 +359,31 @@ function Player() {
     }
   }, []);
   
+  function CoverHandler(){
+    minCover? setMinCover(false) : setMinCover(true);
+    console.log(minCover)
+  }
+
+  // useEffect(() => {
+  //   minCover? setMinCover(false) : setMinCover(true);
+  // }, [minCover]);
+
   return (
-    <Container>
+    <Container >
       {/* 여기 나중에 컴포넌트로 각각 분리함 */}
       <NowPlaying>
+        <TopAlbumCover isTopActive={minCover}>
+          <TopCoverBtn onClick={() => {CoverHandler()}} isTopActive={minCover}>
+            <MdKeyboardArrowDown size='20'/>
+          </TopCoverBtn>
+          <img src={albumCover} alt=''/>
+        </TopAlbumCover>
+        <LeftAlbumCover onClick={() => {CoverHandler()}} isTopActive={minCover}>
+          <LeftCoverBtn onClick={() => {CoverHandler()}} isTopActive={minCover}>
+            <MdKeyboardArrowDown size='20'/>
+          </LeftCoverBtn>
+          <img src={albumCover} alt=''/>
+        </LeftAlbumCover>
         <TitleBox>
           <Title>{trackName}</Title>
           <Artist>{artistName}</Artist>
@@ -301,7 +416,7 @@ function Player() {
             if(repeat === 'repeat'){setRepeat('one')}
             if(repeat === 'one'){setRepeat('off')}
           }}>
-            {repeat === 'off' && <TbRepeat size='22' color='#fff'/>}
+            {repeat === 'off' && <TbRepeat size='22' className={'svgStrokeIcon'}/>}
             {repeat === 'repeat' && <TbRepeat size='22' color='#1ed760'/>}
             {repeat === 'one' && <TbRepeatOnce size='22' color='#1ed760'/>}
           </Btn>
@@ -348,4 +463,3 @@ function Player() {
   );
 }
 
-export default Player;

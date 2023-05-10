@@ -1,13 +1,11 @@
-import { useEffect, useState } from 'react';
-
+// import { useEffect, useState } from 'react';
+// import axios from 'axios';
 import styled from 'styled-components';
+
 import { MdHomeFilled } from 'react-icons/md';
 
 import logo from '../../logo.svg';
-// import TrackInfo from '../../js/api/trackApi'
-// import testApi from '../../js/api/app'
-import getPlayState from '../../js/api/getPlayState';
-
+// import getTokenApi from '../../js/api/getToken';
 
 const Container = styled.div`
   width:400px;
@@ -54,24 +52,13 @@ const Line = styled.hr`
   height:1px;
 `
 
-const AlbumCover = styled.div`
-  width:100%;
-  img{width:100%;}
-`
+// const AlbumCover = styled.div`
+//   width:100%;
+//   img{width:100%;}
+// `
 
 
-function Header() {
-  const [albumImg, setAlbumImg] = useState<string>('');
-  
-  useEffect(() => {
-    // TODO: Player.tsx에도 있음 하나로 통합시키는 게 맞음
-    async function getPlayStateApi(){
-      const playStateInfo = await getPlayState();
-      setAlbumImg(playStateInfo.item.album.images[0].url);
-    }
-    getPlayStateApi();
-  }, []);
-
+export default function Header() {
   return (
     <Container>
       <div>
@@ -96,13 +83,7 @@ function Header() {
             <MenuBtn>내가 만든 플레이리스트ty</MenuBtn>
           </Menu>
         </MenuGroup>
-       
       </div>
-      <AlbumCover>
-        <img src={albumImg} alt=''/>
-      </AlbumCover>
     </Container>
   );
 }
-
-export default Header;

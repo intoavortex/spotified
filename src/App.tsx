@@ -13,7 +13,7 @@ const Wrap = styled.div`
   flex-wrap: wrap;
   width:100vw;
   height:100vh;
-  /* overflow:hidden; */
+  overflow:hidden;
 `
 
 // const App = () => (
