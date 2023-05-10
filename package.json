@@ -53,6 +53,7 @@
     ]
   },
   "devDependencies": {
+    "@types/spotify-web-playback-sdk": "^0.1.15",
     "@types/styled-components": "^5.1.26"
   },
   "resolutions": {

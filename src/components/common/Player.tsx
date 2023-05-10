@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 
 import { AiFillHeart, AiOutlineHeart, AiFillStepForward, AiFillStepBackward } from 'react-icons/ai';
 import { BsPip, BsFillVolumeDownFill, BsFillVolumeOffFill, BsFillVolumeUpFill } from 'react-icons/bs';
@@ -11,9 +12,10 @@ import { HiPlay, HiPause } from 'react-icons/hi';
 import { TbRepeatOnce, TbRepeat, TbDevices } from 'react-icons/tb';
 
 // import TrackInfo from '../../js/api/trackApi'
-import { PlayTrackInfo, PauseTrackInfo } from '../../js/api/playPauseApi'
+// import { PlayTrackInfo, PauseTrackInfo } from '../../js/api/playPauseApi'
 // import RecentlyTrackInfo from '../../js/api/recentlyPlay'
-import getPlayState from '../../js/api/getPlayState';
+// import getPlayState from '../../js/api/getPlayState';
+import getTokenApi from '../../js/api/getToken';
 
 const Container = styled.div`
   overflow:hidden;
@@ -39,7 +41,7 @@ const Container = styled.div`
   > div:first-child + div{
     width:100%;
     max-width:704px;
-    margin-top:-4px;
+    /* margin-top:-4px; */
   }
 
   button .svgIcon{
@@ -120,6 +122,7 @@ const LikeBtn = styled.button`
 const Btn = styled.button`
   background-color: transparent;
   border:none;
+  cursor: pointer;
 `
 
 const PlayerBar = styled.div`
@@ -141,7 +144,7 @@ const BarOverBox = styled.div`
   width:100%;
   max-width:608px;
   height:4px;
-  padding:4px 0;
+  padding:10px 0;
 `
 
 const Barbox = styled.div`
@@ -152,10 +155,10 @@ const Barbox = styled.div`
   border-radius: 2px;
   overflow:hidden;
 `
-// styled-components에서 사용할 변수 타입 지정해주기
-const Bar = styled.a<any>`
+// 이놈임 이녀석이 '그' Bar임
+const Bar = styled.a`
   display:block;
-  width:0;
+  width:30%;
   height:100%;
   border-radius: 2px;
   background-color: #fff;
@@ -185,101 +188,86 @@ function Player() {
   // mouseOver
   // const [mouseHover, setMouseHover] = useState('hsla(0,0%,100%,.7)')
 
-  const [playerState, setPlayerState] = useState<string>('');
-
   const [artistName, setArtistName] = useState<string>('');
   const [trackName, setTrackName] = useState<string>('');
-  const [playTrack, setPlayTrack] = useState<string>('');
   const [playState, setPlayState] = useState<Boolean>(false);
-  const [barState, setBarState] = useState<number>(0);
+  const [duration, setDuration] = useState<{min:number, sec:number}>({min:0, sec:0});
 
   
   useEffect(() => {
+    /* 토큰 또 가져옴 또큰임 걍 */
+    let tokenStr = '';
+    let tokenBearerStr = '';
     
-    // async function TrackApi(){
-    //   const PlayerData = await TrackInfo('7zKieV1uXBhucwmYM4sCzW');
-    //   setArtistName(PlayerData.artists[0].name);
-    //   setTrackName(PlayerData.name);
-    //   setPlayTrack(PlayerData.uri)
-    //   // console.log(PlayerData)
-    // }
-    // TrackApi();
-
-    // async function RecentlyTrackApi(){
-    //   const RecentPlay = await RecentlyTrackInfo();
-    //   // setArtistName(RecentPlay.artists[0].name);
-    //   // setTrackName(RecentPlay.name);
-    //   setPlayTrack(RecentPlay.items[0].track.href)
-    //   // console.log(typeof RecentPlay.items[0].track.href)
-    //   // console.log(RecentPlay)
-    //   // console.log(RecentPlay.items[0].track.href);
-      
-    // }
-    // RecentlyTrackApi();
-
-    // TODO: Header.tsx에도 있음 하나로 통합시키는 게 맞음
-    async function getPlayStateApi(){
-      const playStateInfo = await getPlayState();
-      const playChk = playStateInfo.is_playing;
-      playChk === true? setPlayState(true) : setPlayState(false);
-
-      console.log(playStateInfo);
-      
-
-      // setArtistName(playStateInfo.item.artists[0].name);
-      setTrackName(playStateInfo.item.name);
-      setPlayTrack(playStateInfo.item.album.uri)
-
+    async function getToken(){
+      const getToken = await getTokenApi();
+      tokenStr = getToken.access_token;
+      tokenBearerStr = `Bearer ${getToken.access_token}`; 
     }
-    getPlayStateApi();
-
+    getToken();
     
-  }, []);
-
-  let barWidth:any = 0;
-  async function getPlayStateApi(){
-    const playStateInfo = await getPlayState();
-    const duration = playStateInfo.item.duration_ms;
-    const progress = playStateInfo.progress_ms;
-    let all = progress / duration
-
-    barWidth = all * 100;
-    ;
-  }
+    /* sdk 초기 셋팅 */
+    const script = document.createElement('script');
+    script.src = 'https://sdk.scdn.co/spotify-player.js';
+    script.async = true;
   
-  setInterval(() => {
-    getPlayStateApi();
-    console.log(barWidth);
-    // setBarState(barWidth)
-  }, 1000)
+    document.body.appendChild(script);
+  
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      const spotPlayer = new window.Spotify.Player({
+        name: 'Web Playback SDK',
+        getOAuthToken: (cb) => {
+          cb(tokenStr);
+        },
+        volume: 1,
+      });
 
-  // useEffect(() => {
-  //   console.log('test');
-    
-  // }, []);
+      // 스포티파이 연결
+      spotPlayer.connect();
+      spotPlayer.addListener('ready', ({ device_id }) => {
+        (async function PlayTrackInfo (device_id) {
+          try {
+            const res = await axios.put('https://api.spotify.com/v1/me/player', {
+              device_ids: [device_id],
+              play: false,
+            },
+            {
+              headers: {
+                Authorization: tokenBearerStr,
+              },
+            });
+            return res;
+          } catch (err) {
+            alert(err);
+          }
+        })(device_id);
 
-  async function PlayTrackApi(){
-    const playStateInfo = await getPlayState();
-    const nowPlayState = playStateInfo.is_playing;
-    if(nowPlayState === true) {
-      if(playState === false){
-        setPlayState(true);
-        await PlayTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ', playStateInfo.progress_ms, playStateInfo.item.track_number);
-      }else{
-        setPlayState(false);
-        await PauseTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ', playStateInfo.progress_ms, playStateInfo.item.track_number);
-      }
-    }else{
-      if(playState === false){
-        setPlayState(true);
-        await PlayTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ', playStateInfo.progress_ms, playStateInfo.item.track_number);
-      }else{
-        setPlayState(false);
-        await PauseTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ', playStateInfo.progress_ms, playStateInfo.item.track_number);
-      }
+        
+        
+        
+      });
+      
+      /* 플레이어 상태가 변경될 때마다 */
+      spotPlayer.addListener('player_state_changed', (state) => {
+        if (!state) {
+          return;
+        }
+        state.paused === true? setPlayState(false) : setPlayState(true); 
+        setTrackName(state.track_window.current_track.name);
+        setArtistName(state.track_window.current_track.artists[0].name);
+        setDuration({
+          min: Math.floor((state.duration / 1000) / 60),
+          sec: Math.floor((state.duration / 1000) % 60)
+        })
+      });
+
+      /* 클릭 이벤트 */
+      const playBtn = document.getElementById('playerBtn');
+      playBtn.addEventListener('click', (state) => {
+        spotPlayer.togglePlay();
+      });
     }
-    
-  }
+  }, []);
   
   return (
     <Container>
@@ -304,7 +292,7 @@ function Player() {
             { shuffle === true ? <IoMdShuffle size='22' color='#1ed760'/> : <IoMdShuffle size='22' className={'svgIcon'}/> }
           </Btn>
           <Btn title='이전곡'><AiFillStepBackward size='22' className={'svgIcon'}/></Btn>
-          <Btn title='재생/일시정지' onClick={() => PlayTrackApi()}>
+          <Btn title='재생/일시정지' id="playerBtn">
             {playState === false ? 
               <HiPlay size='40' color='#fff'/> :
               <HiPause size='40' color='#fff'/> 
@@ -327,10 +315,10 @@ function Player() {
           <BarOverBox className='playerBarBox'>
             <Barbox>
               {/* <Bar barWidth={barWidth}></Bar> */}
-              <Bar style={{width:barWidth + '%'}}></Bar>
+              <Bar></Bar>
             </Barbox>
           </BarOverBox>
-          <PlayTime>5:26</PlayTime>
+          <PlayTime>{duration.min}:{duration.sec}</PlayTime>
         </PlayerBar>
       </div>
       
