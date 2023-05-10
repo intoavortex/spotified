@@ -241,10 +241,6 @@ function Player() {
             alert(err);
           }
         })(device_id);
-
-        
-        
-        
       });
       
       /* 플레이어 상태가 변경될 때마다 */
