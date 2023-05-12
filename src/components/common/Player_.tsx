@@ -7,24 +7,26 @@ import { BsPip, BsFillVolumeDownFill, BsFillVolumeOffFill, BsFillVolumeUpFill } 
 import { RiPlayList2Fill } from 'react-icons/ri';
 import { BiFullscreen } from 'react-icons/bi';
 import { IoMdShuffle } from 'react-icons/io';
-import { MdOutlineLyrics } from 'react-icons/md';
+import { MdOutlineLyrics, MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-icons/md';
 import { HiPlay, HiPause } from 'react-icons/hi';
 import { TbRepeatOnce, TbRepeat, TbDevices } from 'react-icons/tb';
 
-// import TrackInfo from '../../js/api/trackApi'
-import { PlayTrackInfo, PauseTrackInfo } from '../../js/api/playPauseApi'
-// import RecentlyTrackInfo from '../../js/api/recentlyPlay'
-import getPlayState from '../../js/api/getPlayState';
 import getTokenApi from '../../js/api/getToken';
 
+interface StyledType {
+  isTopActive: boolean
+}
+
 const Container = styled.div`
-  overflow:hidden;
+  position:relative;
+  /* overflow:hidden; */
   width:100%;
   height:90px;
   background-color:#181818;
   border-top:1px solid #282828;
   box-sizing: border-box;
   color:#fff;
+  z-index:10;
 
   display:flex;
   flex-direction:row;
@@ -51,6 +53,13 @@ const Container = styled.div`
   button:hover .svgIcon{
     fill:#fff;
   }
+  button .svgStrokeIcon{
+    transition: all .3s ease;
+    stroke:hsla(0,0%,100%,.7);
+  }
+  button:hover .svgStrokeIcon{
+    stroke:#fff;
+  }
 
   .playerBarBox:hover a,
   .playerBarBox:hover .svgIcon{
@@ -72,13 +81,14 @@ const NowPlaying = styled.div`
 `
 
 const TitleBox = styled.div`
+  margin-left: 14px;
   margin-right: 14px;
   text-align: left;
 `
 
 const Title = styled.span`
   display: block;
-  max-width:380px;
+  max-width:310px;
   font-size: 14px;
   line-height:22px;
   text-align: left;
@@ -87,7 +97,7 @@ const Title = styled.span`
 
 const Artist = styled.span`
   display: block;
-  max-width:380px;
+  max-width:310px;
   font-size: 11px;
   line-height: 18px;
   text-align: left;
@@ -155,8 +165,8 @@ const Barbox = styled.div`
   border-radius: 2px;
   overflow:hidden;
 `
-// styled-components에서 사용할 변수 타입 지정해주기
-const Bar = styled.a<any>`
+// 이놈임 이녀석이 '그' Bar임
+const Bar = styled.a`
   display:block;
   width:30%;
   height:100%;
@@ -175,7 +185,83 @@ const VolumeBox = styled.div`
   margin-right:4px;
 `
 
-function Player() {
+let TopAlbumCover = styled.div<StyledType>`
+  width: 400px;
+  position: absolute;
+  left:${(props) => (props.isTopActive === true ? '-400px' : '0')};
+  bottom:90px;
+  z-index:1;
+  transition:all .3s ease;
+
+  img{width:100%;}
+`
+let LeftAlbumCover = styled.div<StyledType>`
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
+  overflow: hidden;
+  position:${(props) => (props.isTopActive === true ? 'relative' : 'absolute')};
+  left:${(props) => (props.isTopActive === true ? '0' : '-400px')};
+  bottom: 0;
+  z-index:1;
+  transition:all .3s ease;
+  cursor: pointer;
+
+  img{width:100%;}
+  &:hover a{
+    opacity: 1;
+  }
+`
+
+const TopCoverBtn = styled.div<StyledType>`
+  position: absolute;
+  right:0;
+  top:0;
+  width:30px; height:30px;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  margin-right:10px;
+  margin-top:10px;
+  border:none;
+  border-radius: 50%;
+  background-color: black;
+  opacity: 0.5;
+  cursor: pointer;
+  transition:all .3s ease;
+
+  &:hover{
+    opacity: 1;
+  }
+`
+
+const LeftCoverBtn = styled.div<StyledType>`
+  position: absolute;
+  right:0;
+  top:0;
+  width:24px; height:24px;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  margin-right:5px;
+  margin-top:5px;
+  border:none;
+  border-radius: 50%;
+  background-color: black;
+  opacity: 0;
+  cursor: pointer;
+  transition:all .3s ease;
+
+  &:hover{
+    opacity: 1;
+    width:26px; height:26px;
+    margin-right:7px;
+    margin-top:7px;
+  }
+`
+
+
+export default function Player() {
 
   // 좋아요
   const [likes, setLikes] = useState(false)
@@ -190,46 +276,32 @@ function Player() {
 
   const [artistName, setArtistName] = useState<string>('');
   const [trackName, setTrackName] = useState<string>('');
-  const [playTrack, setPlayTrack] = useState<string>('');
+  const [albumCover, setAlbumCover] = useState<string>('');
+  const [albumCoverToggle, setAlbumCoverToggle] = useState<any>(false);
   const [playState, setPlayState] = useState<Boolean>(false);
-  const [active, setActive] = useState<Boolean>(false);
   const [duration, setDuration] = useState<{min:number, sec:number}>({min:0, sec:0});
+  const [playTime, setPlayTime] = useState<{min:number, sec:number}>({min:0, sec:0});
 
-  
+  /* sdk 초기 셋팅 */
   useEffect(() => {
-
-    // TODO: Header.tsx에도 있음 하나로 통합시키는 게 맞음
-    // 아 이게 아니억다다고고고...
-    // async function getPlayStateApi(){
-    //   const playStateInfo = await getPlayState();
-    //   const playChk = playStateInfo.is_playing;
-    //   playChk === true? setPlayState(true) : setPlayState(false);
-
-    //   // console.log(playStateInfo);
-    //   setTrackName(playStateInfo.item.name);
-    //   setPlayTrack(playStateInfo.item.album.uri)
-
-    // }
-    // getPlayStateApi();
-    
-    
-    /* 토큰 또 가져옴 또큰임 걍 */
-    let tokenStr = '';
-    let tokenBearerStr = '';
-    
-    async function getToken(){
-      const getToken = await getTokenApi();
-      tokenStr = getToken.access_token;
-      tokenBearerStr = `Bearer ${getToken.access_token}`; 
-    }
-    getToken();
-    
-    /* sdk 초기 셋팅 */
     const script = document.createElement('script');
     script.src = 'https://sdk.scdn.co/spotify-player.js';
     script.async = true;
   
     document.body.appendChild(script);
+  }, [])
+  
+  /* 토큰 또 가져옴 또큰임 걍 */
+  let tokenStr = '';
+  let tokenBearerStr = '';
+  async function getToken(){
+    const getToken = await getTokenApi();
+    tokenStr = getToken.access_token;
+    tokenBearerStr = `Bearer ${getToken.access_token}`; 
+  }
+  
+  useEffect(() => {
+    getToken();
   
     window.onSpotifyWebPlaybackSDKReady = () => {
       const spotPlayer = new window.Spotify.Player({
@@ -240,28 +312,9 @@ function Player() {
         volume: 1,
       });
 
-      // console.log(spotPlayer);
-
-      spotPlayer.connect().then(success => {
-        if (success) {
-          // console.log('The Web Playback SDK successfully connected to Spotify!');
-        }
-      })
-
+      // 스포티파이 연결
+      spotPlayer.connect();
       spotPlayer.addListener('ready', ({ device_id }) => {
-        // axios.put('https://api.spotify.com/v1/me/player', 
-        // {
-        //   device_ids: [device_id],
-        //   play: false,
-        // },
-        // {
-        //   headers: {
-        //     Authorization: tokenBearerStr,
-        //   },
-        // });
-        /*
-          위에 거 안 됐던 이유 => 또... 또 async.. 문제엿던 것이다 [킹!!!!!받음!!!!!]
-        */
         (async function PlayTrackInfo (device_id) {
           try {
             const res = await axios.put('https://api.spotify.com/v1/me/player', {
@@ -278,93 +331,112 @@ function Player() {
             alert(err);
           }
         })(device_id);
-
-        
-        
-        
+        curState();
       });
       
+      /* 플레이어 상태가 변경될 때마다 */
       spotPlayer.addListener('player_state_changed', (state) => {
         if (!state) {
           return;
         }
         // console.log(state);
         state.paused === true? setPlayState(false) : setPlayState(true); 
-        setTrackName(state.track_window.current_track.name);
-        setArtistName(state.track_window.current_track.artists[0].name);
-        // console.log(state);
-        // console.log(state.position);
-        // console.log(Math.floor((state.duration / 1000) % 60)); // 초
-        // console.log(Math.floor((state.duration / 1000) / 60)); // 분
+
+        setTrackName(state.track_window.current_track.name === null? '':state.track_window.current_track.name);
+        setArtistName(state.track_window.current_track.artists[0].name === null? '':state.track_window.current_track.artists[0].name);
+        setAlbumCover(state.track_window.current_track.album.images[2].url === null? '':state.track_window.current_track.album.images[2].url);
         setDuration({
           min: Math.floor((state.duration / 1000) / 60),
           sec: Math.floor((state.duration / 1000) % 60)
         })
-        // console.log((state.position / 1000) % 60);
         
-        // console.log(state.track_window.current_track.artists);
-        // setPlayTrack(state.item.album.uri)
-  
-        // setTrack(state.track_window.current_track);
-        // setPaused(state.paused);
-        // setPosition(state.position);
-        // setDuration(state.duration);
-      
-        // spotPlayer.getCurrentState().then((state) => {
-        //   !state ? setActive(true) : setActive(false);
-        // });
+        setPlayTime({
+          min: Math.floor((state.position / 1000) / 60),
+          sec: Math.floor((state.position / 1000) % 60)
+        })
+
+        // if(state !== null && state.paused === false){
+
+        //   setInterval(() => {
+        //     // setPlayTime({
+        //     //   min: Math.floor((state.position / 1000) / 60),
+        //     //   sec: Math.floor((state.position / 1000) % 60)
+        //     // })
+        //     console.log(playTime);
+            
+        //   }, 1000)
+        // }
+
       });
 
+      async function curState () {
+        await spotPlayer.getCurrentState().then(state => {
+          console.log(state);
+          // if(state !== null && state.paused === false){
+
+          //   setInterval(() => {
+          //     // setPlayTime({
+          //     //   min: Math.floor((state.position / 1000) / 60),
+          //     //   sec: Math.floor((state.position / 1000) % 60)
+          //     // })
+          //     console.log(playTime);
+              
+          //   }, 1000)
+          // }
+
+          /*
+            다른 것도 이렇게 바꿔놓는 게 좋을까? 일케 async루 
+            ㅅㅂ 내가 짜놓고 다헷갈리는 코드 레전드~~~ only god knows~~~
+          */
+          
+        });
+      }
       /* 클릭 이벤트 */
       const playBtn = document.getElementById('playerBtn');
-      playBtn.addEventListener('click', (state) => {
-        spotPlayer.togglePlay()
-        // console.log(state);
+      playBtn.addEventListener('click', () => {
+        spotPlayer.togglePlay();
+      
       });
-
-
     }
-  }, []);
-  // console.log(typeof duration);
-  
+  });
 
-  // 스포티파이는 미쳑다 ..
-  // async function getPlayStateApi(){
-  //   const playStateInfo = await getPlayState();
-  // }
-  
-  // setInterval(() => {
-  //   getPlayStateApi();
-  // }, 1000)
+  // useEffect(() => {
+  //   let positionState = curState();
+  //   setInterval(() => {
+  //     setPlayTime({
+  //       min: Math.floor((positionState.position / 1000) / 60),
+  //       sec: Math.floor((positionState.position / 1000) % 60)
+  //     })
+  //   }, 1000)
+  // }, [playTime])
 
-  // ㅋㅋㅋㅋㅋㅋ 이것도 아니엇던 ㅋㅋㅋㅋㅋㅋ 거ㅁ..?
-  // async function PlayTrackApi(){
-  //   const playStateInfo = await getPlayState();
-  //   const nowPlayState = playStateInfo.is_playing;
-  //   if(nowPlayState === true) {
-  //     if(playState === false){
-  //       setPlayState(true);
-  //       await PlayTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ', playStateInfo.progress_ms, playStateInfo.item.track_number);
-  //     }else{
-  //       setPlayState(false);
-  //       await PauseTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ', playStateInfo.progress_ms, playStateInfo.item.track_number);
-  //     }
-  //   }else{
-  //     if(playState === false){
-  //       setPlayState(true);
-  //       await PlayTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ', playStateInfo.progress_ms, playStateInfo.item.track_number);
-  //     }else{
-  //       setPlayState(false);
-  //       await PauseTrackInfo('spotify:album:2yoIDnfb9b819VS5hsh9MZ', playStateInfo.progress_ms, playStateInfo.item.track_number);
-  //     }
-  //   }
-    
-  // }
+
   
+  function CoverHandler(){
+    albumCoverToggle? setAlbumCoverToggle(false) : setAlbumCoverToggle(true);
+    console.log(albumCoverToggle)
+  }
+
+  // useEffect(() => {
+  //   albumCoverToggle? setAlbumCoverToggle(false) : setAlbumCoverToggle(true);
+  // }, [albumCoverToggle]);
+
   return (
-    <Container>
+    <Container >
       {/* 여기 나중에 컴포넌트로 각각 분리함 */}
       <NowPlaying>
+        <TopAlbumCover isTopActive={albumCoverToggle}>
+          <TopCoverBtn onClick={() => {CoverHandler()}} isTopActive={albumCoverToggle}>
+            <MdKeyboardArrowDown size='20'/>
+          </TopCoverBtn>
+          <img src={albumCover} alt=''/>
+        </TopAlbumCover>
+        <LeftAlbumCover onClick={() => {CoverHandler()}} isTopActive={albumCoverToggle}>
+          <LeftCoverBtn onClick={() => {CoverHandler()}} isTopActive={albumCoverToggle}>
+            <MdKeyboardArrowDown size='20'/>
+          </LeftCoverBtn>
+          <img src={albumCover} alt=''/>
+        </LeftAlbumCover>
         <TitleBox>
           <Title>{trackName}</Title>
           <Artist>{artistName}</Artist>
@@ -397,13 +469,13 @@ function Player() {
             if(repeat === 'repeat'){setRepeat('one')}
             if(repeat === 'one'){setRepeat('off')}
           }}>
-            {repeat === 'off' && <TbRepeat size='22' color='#fff'/>}
+            {repeat === 'off' && <TbRepeat size='22' className={'svgStrokeIcon'}/>}
             {repeat === 'repeat' && <TbRepeat size='22' color='#1ed760'/>}
             {repeat === 'one' && <TbRepeatOnce size='22' color='#1ed760'/>}
           </Btn>
         </BtnBox>
         <PlayerBar>
-          <PlayTime>0:00</PlayTime>
+          <PlayTime>{playTime.min}:{playTime.sec}</PlayTime>
           <BarOverBox className='playerBarBox'>
             <Barbox>
               {/* <Bar barWidth={barWidth}></Bar> */}
@@ -444,4 +516,3 @@ function Player() {
   );
 }
 
-export default Player;

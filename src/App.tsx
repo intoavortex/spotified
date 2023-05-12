@@ -1,7 +1,7 @@
 import React from 'react';
 // import logo from './logo.svg';
 import './App.css';
-import Player from './components/common/Player';
+import BottomPlayer from './components/common/Player';
 import Header from './components/common/Header';
 import Container from './container/common/Container'
 
@@ -30,7 +30,7 @@ function App() {
       <Wrap className="App">
         <Header />
         <Container />
-        <Player />
+        <BottomPlayer />
       </Wrap>
     </>
   );

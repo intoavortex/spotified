@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 
@@ -12,6 +12,10 @@ import { HiPlay, HiPause } from 'react-icons/hi';
 import { TbRepeatOnce, TbRepeat, TbDevices } from 'react-icons/tb';
 
 import getTokenApi from '../../js/api/getToken';
+
+interface StyledType {
+  isTopActive: boolean
+}
 
 const Container = styled.div`
   position:relative;
@@ -181,10 +185,6 @@ const VolumeBox = styled.div`
   margin-right:4px;
 `
 
-interface StyledType {
-  isTopActive: boolean
-}
-
 let TopAlbumCover = styled.div<StyledType>`
   width: 400px;
   position: absolute;
@@ -195,7 +195,7 @@ let TopAlbumCover = styled.div<StyledType>`
 
   img{width:100%;}
 `
-let LeftAlbumCover = styled.a<StyledType>`
+let LeftAlbumCover = styled.div<StyledType>`
   width: 56px;
   height: 56px;
   border-radius: 4px;
@@ -213,7 +213,7 @@ let LeftAlbumCover = styled.a<StyledType>`
   }
 `
 
-const TopCoverBtn = styled.a<StyledType>`
+const TopCoverBtn = styled.div<StyledType>`
   position: absolute;
   right:0;
   top:0;
@@ -235,7 +235,7 @@ const TopCoverBtn = styled.a<StyledType>`
   }
 `
 
-const LeftCoverBtn = styled.a<StyledType>`
+const LeftCoverBtn = styled.div<StyledType>`
   position: absolute;
   right:0;
   top:0;
@@ -261,8 +261,7 @@ const LeftCoverBtn = styled.a<StyledType>`
 `
 
 
-export default function Player() {
-
+export default function BottomPlayer() {
   // 좋아요
   const [likes, setLikes] = useState(false)
   // 셔플재생
@@ -277,109 +276,192 @@ export default function Player() {
   const [artistName, setArtistName] = useState<string>('');
   const [trackName, setTrackName] = useState<string>('');
   const [albumCover, setAlbumCover] = useState<string>('');
+  const [albumCoverToggle, setAlbumCoverToggle] = useState<any>(false);
   const [playState, setPlayState] = useState<Boolean>(false);
   const [duration, setDuration] = useState<{min:number, sec:number}>({min:0, sec:0});
-  const [minCover, setMinCover] = useState<any>(false);
+  const [playTime, setPlayTime] = useState<{min:number, sec:number}>({min:0, sec:0});
+  const [isSdkReady, setIsSdkReady] = useState<boolean>(false);
+  const [spotPlayer, setSpotPlayer] = useState<any>(null);
 
-  /* sdk 초기 셋팅 */
+
+  /* sdk 초기 셋팅 --------------------------------------*/
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://sdk.scdn.co/spotify-player.js';
     script.async = true;
   
     document.body.appendChild(script);
+
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      setIsSdkReady(true);
+    }
   }, [])
   
+  /* 토큰 또 가져옴 또큰임 걍 */
+  async function getToken(){
+    const getToken = await getTokenApi();
+    return getToken.access_token;
+  }
+
+  // 트랙 정보
+  const playTrackInfo = useCallback(async (device_id) => {
+    try {
+      const token = await getToken();
+      const res = await axios.put('https://api.spotify.com/v1/me/player', {
+        device_ids: [device_id],
+        play: false,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res;
+    } catch (err) {
+      alert(err);
+    }
+  }, []);
+
+  /*
+  async function PlayTrackInfo (device_id) {
+    try {
+      const token = await getToken();
+      const res = await axios.put('https://api.spotify.com/v1/me/player', {
+        device_ids: [device_id],
+        play: false,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res;
+    } catch (err) {
+      alert(err);
+    }
+  };
+  */
+
+  /* --------------------------------------------------*/
+
+
+  // currentState 가져오기
+  async function curState (spotPlayer) {
+    await spotPlayer.getCurrentState().then(state => {
+      if(state !== null && state.paused === false){
+        // console.log(state);
+
+      }
+    });
+  }
 
   useEffect(() => {
-    /* 토큰 또 가져옴 또큰임 걍 */
-    let tokenStr = '';
-    let tokenBearerStr = '';
-    
-    async function getToken(){
-      const getToken = await getTokenApi();
-      tokenStr = getToken.access_token;
-      tokenBearerStr = `Bearer ${getToken.access_token}`; 
-    }
-    getToken();
+    const initPlayer = async () => {
+      if (!isSdkReady) {
+        return null;
+      }
   
-    window.onSpotifyWebPlaybackSDKReady = () => {
-      const spotPlayer = new window.Spotify.Player({
+      const token = await getToken();
+  
+      const player = new window.Spotify.Player({
         name: 'Web Playback SDK',
         getOAuthToken: (cb) => {
-          cb(tokenStr);
+          cb(token);
         },
         volume: 1,
       });
-
-      // 스포티파이 연결
-      spotPlayer.connect();
-      spotPlayer.addListener('ready', ({ device_id }) => {
-        (async function PlayTrackInfo (device_id) {
-          try {
-            const res = await axios.put('https://api.spotify.com/v1/me/player', {
-              device_ids: [device_id],
-              play: false,
-            },
-            {
-              headers: {
-                Authorization: tokenBearerStr,
-              },
-            });
-            return res;
-          } catch (err) {
-            alert(err);
-          }
-        })(device_id);
-      });
-      
-      /* 플레이어 상태가 변경될 때마다 */
-      spotPlayer.addListener('player_state_changed', (state) => {
-        if (!state) {
-          return;
-        }
-        state.paused === true? setPlayState(false) : setPlayState(true); 
-
-        console.log(state);
-        
-        setTrackName(state.track_window.current_track.name === null? '':state.track_window.current_track.name);
-        setArtistName(state.track_window.current_track.artists[0].name === null? '':state.track_window.current_track.artists[0].name);
-        setAlbumCover(state.track_window.current_track.album.images[2].url === null? '':state.track_window.current_track.album.images[2].url);
-        setDuration({
-          min: Math.floor((state.duration / 1000) / 60),
-          sec: Math.floor((state.duration / 1000) % 60)
-        })
-      });
-
-      /* 클릭 이벤트 */
-      const playBtn = document.getElementById('playerBtn');
-      playBtn.addEventListener('click', (state) => {
-        spotPlayer.togglePlay();
-      });
-    }
-  }, []);
   
-  function CoverHandler(){
-    minCover? setMinCover(false) : setMinCover(true);
-    console.log(minCover)
-  }
+      setSpotPlayer(player);
+    }
+
+    initPlayer();
+  }, [isSdkReady]);
+
+  useEffect(() => {
+    if (!spotPlayer) {
+      return;
+    }
+
+    spotPlayer.connect();
+
+    spotPlayer.addListener('ready', ({ device_id }) => {
+      playTrackInfo(device_id)
+      // curState(spotPlayer);
+      spotPlayer.getCurrentState().then(state => {
+        if(state !== null && state.paused === false){
+          console.log(state);
+        }
+      })
+    });
+
+    /* 플레이어 상태가 변경될 때마다 */
+    spotPlayer.addListener('player_state_changed', (state) => {
+      if (!state) {
+        return;
+      }
+      // console.log(state);
+      state.paused === true? setPlayState(false) : setPlayState(true); 
+
+      setTrackName(state.track_window.current_track.name === null? '':state.track_window.current_track.name);
+      setArtistName(state.track_window.current_track.artists[0].name === null? '':state.track_window.current_track.artists[0].name);
+      setAlbumCover(state.track_window.current_track.album.images[2].url === null? '':state.track_window.current_track.album.images[2].url);
+      setDuration({
+        min: Math.floor((state.duration / 1000) / 60),
+        sec: Math.floor((state.duration / 1000) % 60)
+      })
+      
+      setPlayTime({
+        min: Math.floor((state.position / 1000) / 60),
+        sec: Math.floor((state.position / 1000) % 60)
+      })
+
+      spotPlayer.getCurrentState().then(state => {
+        if(state !== null && state.paused === false){
+          console.log(state);
+        }
+      })
+    });
+
+    /* 클릭 이벤트 */
+    const playBtn = document.getElementById('playerBtn');
+    playBtn.addEventListener('click', () => {
+      spotPlayer.togglePlay();
+    });
+
+
+    
+    
+  }, [spotPlayer, playTrackInfo]);
+
 
   // useEffect(() => {
-  //   minCover? setMinCover(false) : setMinCover(true);
-  // }, [minCover]);
+  //   // let positionState = curState();
+  //   // setInterval(() => {
+  //   //   setPlayTime({
+  //   //     min: Math.floor((positionState.position / 1000) / 60),
+  //   //     sec: Math.floor((positionState.position / 1000) % 60)
+  //   //   })
+  //   // }, 1000)
+  // }, [playTime])
+
+
+  
+  const CoverHandler = () => {
+    albumCoverToggle? setAlbumCoverToggle(false) : setAlbumCoverToggle(true);
+  }
 
   return (
     <Container >
       {/* 여기 나중에 컴포넌트로 각각 분리함 */}
       <NowPlaying>
-        <TopAlbumCover isTopActive={minCover}>
-          <TopCoverBtn onClick={() => {CoverHandler()}} isTopActive={minCover}>
+        <TopAlbumCover isTopActive={albumCoverToggle}>
+          <TopCoverBtn onClick={() => {CoverHandler()}} isTopActive={albumCoverToggle}>
             <MdKeyboardArrowDown size='20'/>
           </TopCoverBtn>
           <img src={albumCover} alt=''/>
         </TopAlbumCover>
-        <LeftAlbumCover onClick={() => {CoverHandler()}} isTopActive={minCover}>
-          <LeftCoverBtn onClick={() => {CoverHandler()}} isTopActive={minCover}>
+        <LeftAlbumCover isTopActive={albumCoverToggle}>
+          <LeftCoverBtn onClick={() => {CoverHandler()}} isTopActive={albumCoverToggle}>
             <MdKeyboardArrowDown size='20'/>
           </LeftCoverBtn>
           <img src={albumCover} alt=''/>
@@ -422,7 +504,7 @@ export default function Player() {
           </Btn>
         </BtnBox>
         <PlayerBar>
-          <PlayTime>0:00</PlayTime>
+          <PlayTime>{playTime.min}:{playTime.sec}</PlayTime>
           <BarOverBox className='playerBarBox'>
             <Barbox>
               {/* <Bar barWidth={barWidth}></Bar> */}
