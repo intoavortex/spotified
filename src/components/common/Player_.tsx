@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 
@@ -81,6 +81,7 @@ const NowPlaying = styled.div`
 `
 
 const TitleBox = styled.div`
+  transition:all .3s ease;
   margin-left: 14px;
   margin-right: 14px;
   text-align: left;
@@ -261,8 +262,7 @@ const LeftCoverBtn = styled.div<StyledType>`
 `
 
 
-export default function Player() {
-
+export default function BottomPlayer() {
   // 좋아요
   const [likes, setLikes] = useState(false)
   // 셔플재생
@@ -277,162 +277,261 @@ export default function Player() {
   const [artistName, setArtistName] = useState<string>('');
   const [trackName, setTrackName] = useState<string>('');
   const [albumCover, setAlbumCover] = useState<string>('');
-  const [albumCoverToggle, setAlbumCoverToggle] = useState<any>(false);
-  const [playState, setPlayState] = useState<Boolean>(false);
+  const [isCoverToggle, setIsCoverToggle] = useState<any>(false);
   const [duration, setDuration] = useState<{min:number, sec:number}>({min:0, sec:0});
   const [playTime, setPlayTime] = useState<{min:number, sec:number}>({min:0, sec:0});
+  const [spotPlayer, setSpotPlayer] = useState<any>(null);
+  const [isSdkReady, setIsSdkReady] = useState<boolean>(false);
+  const [isPlay, setIsPlay] = useState<boolean>(false);
+  // let  interval = useRef<number | undefined>();
 
-  /* sdk 초기 셋팅 */
+  /* sdk 초기 셋팅 --------------------------------------*/
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://sdk.scdn.co/spotify-player.js';
     script.async = true;
   
     document.body.appendChild(script);
+
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      setIsSdkReady(true);
+    }
   }, [])
   
   /* 토큰 또 가져옴 또큰임 걍 */
-  let tokenStr = '';
-  let tokenBearerStr = '';
   async function getToken(){
     const getToken = await getTokenApi();
-    tokenStr = getToken.access_token;
-    tokenBearerStr = `Bearer ${getToken.access_token}`; 
+    return getToken.access_token;
   }
-  
+
+  // 트랙 정보
+  const playTrackInfo = useCallback(async (device_id) => {
+    try {
+      const token = await getToken();
+      const res = await axios.put('https://api.spotify.com/v1/me/player', {
+        device_ids: [device_id],
+        play: false,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res;
+    } catch (err) {
+      alert(err);
+    }
+  }, []);
+
+  /*
+  async function PlayTrackInfo (device_id) {
+    try {
+      const token = await getToken();
+      const res = await axios.put('https://api.spotify.com/v1/me/player', {
+        device_ids: [device_id],
+        play: false,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res;
+    } catch (err) {
+      alert(err);
+    }
+  };
+  */
+
+  /* --------------------------------------------------*/
+
+
+  // currentState 가져오기
+  // async function curState (spotPlayer) {
+  //   await spotPlayer.getCurrentState().then(state => {
+  //     if(state !== null && state.paused === false){
+  //       // console.log(state);
+
+  //     }
+  //   });
+  // }
+
   useEffect(() => {
-    getToken();
+    const initPlayer = async () => {
+      if (!isSdkReady) {
+        return null;
+      }
   
-    window.onSpotifyWebPlaybackSDKReady = () => {
-      const spotPlayer = new window.Spotify.Player({
+      const token = await getToken();
+  
+      const player = new window.Spotify.Player({
         name: 'Web Playback SDK',
         getOAuthToken: (cb) => {
-          cb(tokenStr);
+          cb(token);
         },
         volume: 1,
       });
+  
+    /* 플레이어 상태가 변경될 때마다 */
+    player.addListener('player_state_changed', (state) => {
+      if (!state) {
+        return;
+      }
+      // console.log(state);
+      state.paused === true? setIsPlay(false) : setIsPlay(true); 
 
-      // 스포티파이 연결
-      spotPlayer.connect();
-      spotPlayer.addListener('ready', ({ device_id }) => {
-        (async function PlayTrackInfo (device_id) {
-          try {
-            const res = await axios.put('https://api.spotify.com/v1/me/player', {
-              device_ids: [device_id],
-              play: false,
-            },
-            {
-              headers: {
-                Authorization: tokenBearerStr,
-              },
-            });
-            return res;
-          } catch (err) {
-            alert(err);
-          }
-        })(device_id);
-        curState();
-      });
+      setTrackName(state.track_window.current_track.name === null? '':state.track_window.current_track.name);
+      setArtistName(state.track_window.current_track.artists[0].name === null? '':state.track_window.current_track.artists[0].name);
+      setAlbumCover(state.track_window.current_track.album.images[2].url === null? '':state.track_window.current_track.album.images[2].url);
+      setDuration({
+        min: Math.floor((state.duration / 1000) / 60),
+        sec: Math.floor((state.duration / 1000) % 60)
+      })
       
-      /* 플레이어 상태가 변경될 때마다 */
-      spotPlayer.addListener('player_state_changed', (state) => {
-        if (!state) {
-          return;
-        }
-        // console.log(state);
-        state.paused === true? setPlayState(false) : setPlayState(true); 
+      // setPlayTime({
+      //   min: Math.floor((state.position / 1000) / 60),
+      //   sec: Math.floor((state.position / 1000) % 60)
+      // })
+    });
 
-        setTrackName(state.track_window.current_track.name === null? '':state.track_window.current_track.name);
-        setArtistName(state.track_window.current_track.artists[0].name === null? '':state.track_window.current_track.artists[0].name);
-        setAlbumCover(state.track_window.current_track.album.images[2].url === null? '':state.track_window.current_track.album.images[2].url);
-        setDuration({
-          min: Math.floor((state.duration / 1000) / 60),
-          sec: Math.floor((state.duration / 1000) % 60)
-        })
+    /* 클릭 이벤트 */
+    const playBtn = document.getElementById('playerBtn');
+    playBtn.addEventListener('click', () => {
+      player.togglePlay();
+      // console.log(isPlay);
+    });
+
+      setSpotPlayer(player);
+    }
+
+    initPlayer();
+  }, [isSdkReady]);
+
+  useEffect(() => {
+    if (!spotPlayer) {
+      return;
+    }
+
+    spotPlayer.connect();
+
+    spotPlayer.addListener('ready', ({ device_id }) => {
+      playTrackInfo(device_id)
+      // curState(spotPlayer);
+      spotPlayer.getCurrentState().then(state => {
+        if(state !== null && state.paused === false){
+          console.log(state);
+        }
+      })
+    });
+
+
+
+    // spotPlayer.getCurrentState().then(state => {
+      
+    //   // let playTimeText = () => {
+    //   //   setPlayTime({
+    //   //     min: Math.floor((state.position / 1000) / 60),
+    //   //     sec: Math.floor((state.position / 1000) % 60)
+    //   //   })
+    //   //   console.log('play');
+    //   // }
+  
+    //   // console.log(state);
+
+    //   // let playIv = setInterval(() => {
         
+    //   //   // if(state !== null && state.paused === false){
+    //   //   //   setPlayTime({
+    //   //   //     min: Math.floor((state.position / 1000) / 60),
+    //   //   //     sec: Math.floor((state.position / 1000) % 60)
+    //   //   //   })
+    //   //   //   console.log('play');
+          
+    //   //   // }else{
+    //   //   //   clearInterval(playIv);
+    //   //   //   console.log('pause');
+    //   //   // }
+    //   // }, 1000);
+    //   // return () => {
+    //   //   clearInterval(playIv);
+    //   // }
+
+    //   let playTimeText = () => {
+    //     setPlayTime({
+    //       min: Math.floor((state.position / 1000) / 60),
+    //       sec: Math.floor((state.position / 1000) % 60)
+    //     })
+    //     // console.log('play');
+    //     // console.log(isPlay);
+    //     // console.log(playTime);
+    //   }
+      
+      
+
+    //   interval.current = window.setInterval(playTimeText, 1000);
+    //   return () => {
+    //     clearInterval(interval.current);
+    //   }
+    // })
+  }, [spotPlayer, playTrackInfo, isPlay, playTime]);
+  
+  
+  
+  useEffect(() => { 
+    if (!spotPlayer) {
+      return;
+    }
+
+    // spotPlayer.connect();
+
+    spotPlayer.getCurrentState().then(state => {
+      let playTimeText = () => {
         setPlayTime({
           min: Math.floor((state.position / 1000) / 60),
           sec: Math.floor((state.position / 1000) % 60)
         })
 
-        // if(state !== null && state.paused === false){
-
-        //   setInterval(() => {
-        //     // setPlayTime({
-        //     //   min: Math.floor((state.position / 1000) / 60),
-        //     //   sec: Math.floor((state.position / 1000) % 60)
-        //     // })
-        //     console.log(playTime);
-            
-        //   }, 1000)
-        // }
-
-      });
-
-      async function curState () {
-        await spotPlayer.getCurrentState().then(state => {
-          console.log(state);
-          // if(state !== null && state.paused === false){
-
-          //   setInterval(() => {
-          //     // setPlayTime({
-          //     //   min: Math.floor((state.position / 1000) / 60),
-          //     //   sec: Math.floor((state.position / 1000) % 60)
-          //     // })
-          //     console.log(playTime);
-              
-          //   }, 1000)
-          // }
-
-          /*
-            다른 것도 이렇게 바꿔놓는 게 좋을까? 일케 async루 
-            ㅅㅂ 내가 짜놓고 다헷갈리는 코드 레전드~~~ only god knows~~~
-          */
-          
-        });
+        // console.log(Math.floor((state.position / 1000) % 60));
+        // console.log('play');
+        // console.log(isPlay);
+        // console.log(playTime);
+        console.log(state);
+        
+        // console.log('test');
       }
-      /* 클릭 이벤트 */
-      const playBtn = document.getElementById('playerBtn');
-      playBtn.addEventListener('click', () => {
-        spotPlayer.togglePlay();
       
-      });
-    }
-  });
+      let interval;
+      if(isPlay){
+        interval = setInterval(playTimeText, 1000);
+        console.log(isPlay);
+        return () => {
+            clearInterval(interval);
+        }
+      }else if(!isPlay){
+        clearInterval(interval)
+        console.log(isPlay);
+      }
+      return () => clearInterval(interval);
+    })
+  }, [spotPlayer, isPlay]); 
 
-  // useEffect(() => {
-  //   let positionState = curState();
-  //   setInterval(() => {
-  //     setPlayTime({
-  //       min: Math.floor((positionState.position / 1000) / 60),
-  //       sec: Math.floor((positionState.position / 1000) % 60)
-  //     })
-  //   }, 1000)
-  // }, [playTime])
 
-
-  
-  function CoverHandler(){
-    albumCoverToggle? setAlbumCoverToggle(false) : setAlbumCoverToggle(true);
-    console.log(albumCoverToggle)
+  const CoverHandler = () => {
+    isCoverToggle? setIsCoverToggle(false) : setIsCoverToggle(true);
   }
-
-  // useEffect(() => {
-  //   albumCoverToggle? setAlbumCoverToggle(false) : setAlbumCoverToggle(true);
-  // }, [albumCoverToggle]);
 
   return (
     <Container >
       {/* 여기 나중에 컴포넌트로 각각 분리함 */}
       <NowPlaying>
-        <TopAlbumCover isTopActive={albumCoverToggle}>
-          <TopCoverBtn onClick={() => {CoverHandler()}} isTopActive={albumCoverToggle}>
+        <TopAlbumCover isTopActive={isCoverToggle}>
+          <TopCoverBtn onClick={() => {CoverHandler()}} isTopActive={isCoverToggle}>
             <MdKeyboardArrowDown size='20'/>
           </TopCoverBtn>
           <img src={albumCover} alt=''/>
         </TopAlbumCover>
-        <LeftAlbumCover onClick={() => {CoverHandler()}} isTopActive={albumCoverToggle}>
-          <LeftCoverBtn onClick={() => {CoverHandler()}} isTopActive={albumCoverToggle}>
+        <LeftAlbumCover isTopActive={isCoverToggle}>
+          <LeftCoverBtn onClick={() => {CoverHandler()}} isTopActive={isCoverToggle}>
             <MdKeyboardArrowDown size='20'/>
           </LeftCoverBtn>
           <img src={albumCover} alt=''/>
@@ -457,7 +556,7 @@ export default function Player() {
           </Btn>
           <Btn title='이전곡'><AiFillStepBackward size='22' className={'svgIcon'}/></Btn>
           <Btn title='재생/일시정지' id="playerBtn">
-            {playState === false ? 
+            {isPlay === false ? 
               <HiPlay size='40' color='#fff'/> :
               <HiPause size='40' color='#fff'/> 
             }

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 
@@ -15,6 +15,9 @@ import getTokenApi from '../../js/api/getToken';
 
 interface StyledType {
   isTopActive: boolean
+}
+interface BarStyledType {
+  isPlayBar: number
 }
 
 const Container = styled.div`
@@ -71,6 +74,11 @@ const Container = styled.div`
   .playerBarBox:hover .svgIcon{
     fill:#fff;
   }
+  
+  .playerBarBox:hover > div > div{
+    opacity:1;
+    transition: all .13s ease;
+  }
 `
 
 const NowPlaying = styled.div`
@@ -81,6 +89,7 @@ const NowPlaying = styled.div`
 `
 
 const TitleBox = styled.div`
+  transition:all .3s ease;
   margin-left: 14px;
   margin-right: 14px;
   text-align: left;
@@ -151,6 +160,7 @@ const PlayTime = styled.span`
 `
 
 const BarOverBox = styled.div`
+  position: relative;
   width:100%;
   max-width:608px;
   height:4px;
@@ -166,9 +176,35 @@ const Barbox = styled.div`
   overflow:hidden;
 `
 // 이놈임 이녀석이 '그' Bar임
-const Bar = styled.a`
+const PlayBar = styled.a<BarStyledType>`
   display:block;
-  width:30%;
+  width:  100%;
+  // isPlayBar
+  height:100%;
+  border-radius: 2px;
+  background-color: #fff;
+  transform:translateX(-100%);
+  position: relative;
+  left:${(props) => (props.isPlayBar)}%;
+`
+
+const BarCircle = styled.div<BarStyledType>`
+  width:12px;
+  height:12px;
+  border-radius: 50%;
+  background-color: #fff;
+  position:absolute;
+  left:${(props) => (props.isPlayBar)}%;
+  top:50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  z-index:2;
+`
+
+const VolumeBar = styled.a`
+  display:block;
+  width:  40%;
+  // isPlayBar
   height:100%;
   border-radius: 2px;
   background-color: #fff;
@@ -271,18 +307,21 @@ export default function BottomPlayer() {
   // 볼륨 조절
   const [volume, setVolume] = useState('max')
   // mouseOver
+
   // const [mouseHover, setMouseHover] = useState('hsla(0,0%,100%,.7)')
 
   const [artistName, setArtistName] = useState<string>('');
   const [trackName, setTrackName] = useState<string>('');
   const [albumCover, setAlbumCover] = useState<string>('');
-  const [albumCoverToggle, setAlbumCoverToggle] = useState<any>(false);
-  const [playState, setPlayState] = useState<Boolean>(false);
+  const [isCoverToggle, setIsCoverToggle] = useState<any>(false);
+  const [isBarWidth, setIsBarWidth] = useState<number>(0);
   const [duration, setDuration] = useState<{min:number, sec:number}>({min:0, sec:0});
   const [playTime, setPlayTime] = useState<{min:number, sec:number}>({min:0, sec:0});
-  const [isSdkReady, setIsSdkReady] = useState<boolean>(false);
+  const [seekCirclePos, setSeekCirclePos] = useState<{current:number, original:number}>({current:0, original:0});
   const [spotPlayer, setSpotPlayer] = useState<any>(null);
-
+  const [isSdkReady, setIsSdkReady] = useState<boolean>(false);
+  const [isPlay, setIsPlay] = useState<boolean>(false);
+  // let  interval = useRef<number | undefined>();
 
   /* sdk 초기 셋팅 --------------------------------------*/
   useEffect(() => {
@@ -346,14 +385,14 @@ export default function BottomPlayer() {
 
 
   // currentState 가져오기
-  async function curState (spotPlayer) {
-    await spotPlayer.getCurrentState().then(state => {
-      if(state !== null && state.paused === false){
-        // console.log(state);
+  // async function curState (spotPlayer) {
+  //   await spotPlayer.getCurrentState().then(state => {
+  //     if(state !== null && state.paused === false){
+  //       // console.log(state);
 
-      }
-    });
-  }
+  //     }
+  //   });
+  // }
 
   useEffect(() => {
     const initPlayer = async () => {
@@ -371,6 +410,37 @@ export default function BottomPlayer() {
         volume: 1,
       });
   
+    /* 플레이어 상태가 변경될 때마다 */
+    player.addListener('player_state_changed', (state) => {
+      if (!state) {
+        return;
+      }
+      // console.log(state);
+      state.paused === true? setIsPlay(false) : setIsPlay(true); 
+
+      setTrackName(state.track_window.current_track.name === null? '':state.track_window.current_track.name);
+      setArtistName(state.track_window.current_track.artists[0].name === null? '':state.track_window.current_track.artists[0].name);
+      setAlbumCover(state.track_window.current_track.album.images[2].url === null? '':state.track_window.current_track.album.images[2].url);
+      setDuration({
+        min: Math.floor((state.duration / 1000) / 60),
+        sec: Math.floor((state.duration / 1000) % 60)
+      })
+      
+      setPlayTime({
+        min: Math.floor((state.position / 1000) / 60),
+        sec: Math.floor((state.position / 1000) % 60)
+      })
+
+      setIsBarWidth((state.position / state.duration) * 100)
+    });
+
+    /* 클릭 이벤트 */
+    const playBtn = document.getElementById('playerBtn');
+    playBtn.addEventListener('click', () => {
+      player.togglePlay();
+      // console.log(isPlay);
+    });
+
       setSpotPlayer(player);
     }
 
@@ -394,74 +464,77 @@ export default function BottomPlayer() {
       })
     });
 
-    /* 플레이어 상태가 변경될 때마다 */
-    spotPlayer.addListener('player_state_changed', (state) => {
-      if (!state) {
-        return;
-      }
-      // console.log(state);
-      state.paused === true? setPlayState(false) : setPlayState(true); 
+    // spotPlayer.seek(60 * 1000).then((position_ms) => {
+    //   console.log(position_ms);
+    // });
 
-      setTrackName(state.track_window.current_track.name === null? '':state.track_window.current_track.name);
-      setArtistName(state.track_window.current_track.artists[0].name === null? '':state.track_window.current_track.artists[0].name);
-      setAlbumCover(state.track_window.current_track.album.images[2].url === null? '':state.track_window.current_track.album.images[2].url);
-      setDuration({
-        min: Math.floor((state.duration / 1000) / 60),
-        sec: Math.floor((state.duration / 1000) % 60)
-      })
-      
-      setPlayTime({
-        min: Math.floor((state.position / 1000) / 60),
-        sec: Math.floor((state.position / 1000) % 60)
-      })
-
-      spotPlayer.getCurrentState().then(state => {
-        if(state !== null && state.paused === false){
-          console.log(state);
-        }
-      })
-    });
-
-    /* 클릭 이벤트 */
-    const playBtn = document.getElementById('playerBtn');
-    playBtn.addEventListener('click', () => {
-      spotPlayer.togglePlay();
-    });
-
-
-    
-    
-  }, [spotPlayer, playTrackInfo]);
-
-
-  // useEffect(() => {
-  //   // let positionState = curState();
-  //   // setInterval(() => {
-  //   //   setPlayTime({
-  //   //     min: Math.floor((positionState.position / 1000) / 60),
-  //   //     sec: Math.floor((positionState.position / 1000) % 60)
-  //   //   })
-  //   // }, 1000)
-  // }, [playTime])
-
-
+  }, [spotPlayer, playTrackInfo, isPlay, playTime]);
   
+  
+  
+  useEffect(() => { 
+    if (!spotPlayer) {
+      return;
+    }
+
+    let playTimeText = () => {
+      spotPlayer.getCurrentState().then(state => {
+        setPlayTime({
+          min: Math.floor((state.position / 1000) / 60),
+          sec: Math.floor((state.position / 1000) % 60)
+        })
+
+        setIsBarWidth((state.position / state.duration) * 100)
+      })
+    }
+      
+      let interval;
+      if(isPlay){
+        interval = setInterval(playTimeText, 1000);
+        console.log(isPlay);
+        return () => {
+            clearInterval(interval);
+        }
+      }else if(!isPlay){
+        clearInterval(interval)
+        console.log(isPlay);
+      }
+      return () => clearInterval(interval);
+  }, [spotPlayer, isPlay]); 
+
+
   const CoverHandler = () => {
-    albumCoverToggle? setAlbumCoverToggle(false) : setAlbumCoverToggle(true);
+    isCoverToggle? setIsCoverToggle(false) : setIsCoverToggle(true);
+  }
+
+  let posX = 0;
+  let originalX = 0;
+
+  const PlaySeekHandler = (e, type) => {
+    // e = e || window.event;
+    e.preventDefault();
+    e.stopPropagation();
+    posX = e.clientX;
+    console.log(e.clientX)
+    // console.log(e.target.offsetLeft)
+    // console.log(type)
   }
 
   return (
-    <Container >
+    <Container  onDragEnter={(event) => PlaySeekHandler(event, 'enter')}
+                onDragOver={(event) => { return PlaySeekHandler(event, 'over'); }} 
+                onDrop={(event) => PlaySeekHandler(event, 'drop')}
+                onDragLeave={(event) => PlaySeekHandler(event, 'leave')}>
       {/* 여기 나중에 컴포넌트로 각각 분리함 */}
       <NowPlaying>
-        <TopAlbumCover isTopActive={albumCoverToggle}>
-          <TopCoverBtn onClick={() => {CoverHandler()}} isTopActive={albumCoverToggle}>
+        <TopAlbumCover isTopActive={isCoverToggle}>
+          <TopCoverBtn onClick={() => {CoverHandler()}} isTopActive={isCoverToggle}>
             <MdKeyboardArrowDown size='20'/>
           </TopCoverBtn>
           <img src={albumCover} alt=''/>
         </TopAlbumCover>
-        <LeftAlbumCover isTopActive={albumCoverToggle}>
-          <LeftCoverBtn onClick={() => {CoverHandler()}} isTopActive={albumCoverToggle}>
+        <LeftAlbumCover isTopActive={isCoverToggle}>
+          <LeftCoverBtn onClick={() => {CoverHandler()}} isTopActive={isCoverToggle}>
             <MdKeyboardArrowDown size='20'/>
           </LeftCoverBtn>
           <img src={albumCover} alt=''/>
@@ -486,7 +559,7 @@ export default function BottomPlayer() {
           </Btn>
           <Btn title='이전곡'><AiFillStepBackward size='22' className={'svgIcon'}/></Btn>
           <Btn title='재생/일시정지' id="playerBtn">
-            {playState === false ? 
+            {isPlay === false ? 
               <HiPlay size='40' color='#fff'/> :
               <HiPause size='40' color='#fff'/> 
             }
@@ -508,7 +581,10 @@ export default function BottomPlayer() {
           <BarOverBox className='playerBarBox'>
             <Barbox>
               {/* <Bar barWidth={barWidth}></Bar> */}
-              <Bar></Bar>
+              <PlayBar isPlayBar={isBarWidth}></PlayBar>
+              <BarCircle  draggable 
+                          isPlayBar={isBarWidth} 
+              ></BarCircle>
             </Barbox>
           </BarOverBox>
           <PlayTime>{duration.min}:{duration.sec}</PlayTime>
@@ -536,7 +612,7 @@ export default function BottomPlayer() {
             <RiVolumeMuteFill size='20' color={mouseHover}/>
           </Btn> */}
           <Barbox>
-            <Bar></Bar>
+            <VolumeBar></VolumeBar>
           </Barbox>
         </VolumeBox>
         <Btn title='전체화면'><BiFullscreen size='20' className={'svgIcon'}/></Btn>
