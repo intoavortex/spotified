@@ -18,6 +18,8 @@ interface StyledType {
 }
 interface BarStyledType {
   isPlayBar: number
+  playBarPosition: number
+  isSeekingState:boolean
 }
 
 const Container = styled.div`
@@ -185,7 +187,7 @@ const PlayBar = styled.a<BarStyledType>`
   background-color: #fff;
   transform:translateX(-100%);
   position: relative;
-  left:${(props) => (props.isPlayBar)}%;
+  left:${(props) => (props.isSeekingState === true? props.isPlayBar : props.playBarPosition)}%;
 `
 
 const BarCircle = styled.div<BarStyledType>`
@@ -194,7 +196,7 @@ const BarCircle = styled.div<BarStyledType>`
   border-radius: 50%;
   background-color: #fff;
   position:absolute;
-  left:${(props) => (props.isPlayBar)}%;
+  left:${(props) => (props.isSeekingState === true? props.isPlayBar : props.playBarPosition)}%;
   top:50%;
   transform: translateY(-50%);
   opacity: 0;
@@ -317,10 +319,12 @@ export default function BottomPlayer() {
   const [isBarWidth, setIsBarWidth] = useState<number>(0);
   const [duration, setDuration] = useState<{min:number, sec:number}>({min:0, sec:0});
   const [playTime, setPlayTime] = useState<{min:number, sec:number}>({min:0, sec:0});
-  const [seekCirclePos, setSeekCirclePos] = useState<{current:number, original:number}>({current:0, original:0});
+  const [seekCirclePos, setSeekCirclePos] = useState<number>(0);
+  // const [seekCirclePos, setSeekCirclePos] = useState<{current:number, original:number}>({current:0, original:0});
   const [spotPlayer, setSpotPlayer] = useState<any>(null);
   const [isSdkReady, setIsSdkReady] = useState<boolean>(false);
   const [isPlay, setIsPlay] = useState<boolean>(false);
+  const [isSeeking, setIsSeeking] = useState<boolean>(false);
   // let  interval = useRef<number | undefined>();
 
   /* sdk 초기 셋팅 --------------------------------------*/
@@ -464,9 +468,9 @@ export default function BottomPlayer() {
       })
     });
 
-    // spotPlayer.seek(60 * 1000).then((position_ms) => {
-    //   console.log(position_ms);
-    // });
+    spotPlayer.seek(62 * 1000).then(state => {
+      console.log(state);
+    });
 
   }, [spotPlayer, playTrackInfo, isPlay, playTime]);
   
@@ -508,21 +512,26 @@ export default function BottomPlayer() {
   }
 
   let posX = 0;
-  let originalX = 0;
-
+  const window_W = window.innerWidth;
+  const player_bar = document.getElementById('playerBarBox');
+  const bar_circle = document.getElementById('barCircle');
+  const bar_w = player_bar?.getBoundingClientRect().width;
+  const minPosX = (window_W - bar_w) / 2;
+  const maxPosX = ((window_W - bar_w) / 2) + bar_w;
+  const originalX = bar_circle?.getBoundingClientRect().x;
+  
   const PlaySeekHandler = (e, type) => {
-    // e = e || window.event;
     e.preventDefault();
     e.stopPropagation();
     posX = e.clientX;
-    console.log(e.clientX)
-    // console.log(e.target.offsetLeft)
-    // console.log(type)
+    posX = (Math.min(Math.max(posX - minPosX, 0), bar_w) / bar_w) * 100 ;
+    setSeekCirclePos(posX)
+    console.log(seekCirclePos);
   }
 
   return (
     <Container  onDragEnter={(event) => PlaySeekHandler(event, 'enter')}
-                onDragOver={(event) => { return PlaySeekHandler(event, 'over'); }} 
+                onDragOver={(event) => { return PlaySeekHandler(event, 'over')}} 
                 onDrop={(event) => PlaySeekHandler(event, 'drop')}
                 onDragLeave={(event) => PlaySeekHandler(event, 'leave')}>
       {/* 여기 나중에 컴포넌트로 각각 분리함 */}
@@ -577,17 +586,21 @@ export default function BottomPlayer() {
           </Btn>
         </BtnBox>
         <PlayerBar>
-          <PlayTime>{playTime.min}:{playTime.sec}</PlayTime>
-          <BarOverBox className='playerBarBox'>
+         <PlayTime>{playTime.min}:{playTime.sec < 10? '0' + playTime.sec : playTime.sec}</PlayTime>
+          <BarOverBox className='playerBarBox' id='playerBarBox'>
             <Barbox>
               {/* <Bar barWidth={barWidth}></Bar> */}
-              <PlayBar isPlayBar={isBarWidth}></PlayBar>
-              <BarCircle  draggable 
-                          isPlayBar={isBarWidth} 
+              <PlayBar playBarPosition={seekCirclePos} isPlayBar={isBarWidth} isSeekingState={isSeeking}></PlayBar>
+              <BarCircle  id='barCircle'
+                          draggable 
+                          playBarPosition={seekCirclePos}
+                          isSeekingState={isSeeking}
+                          isPlayBar={isBarWidth}
+                          onClick={() => {isSeeking? setIsSeeking(true) : setIsSeeking(false);}}
               ></BarCircle>
             </Barbox>
           </BarOverBox>
-          <PlayTime>{duration.min}:{duration.sec}</PlayTime>
+          <PlayTime>{duration.min}:{duration.sec < 10? '0' + duration.sec : duration.sec}</PlayTime>
         </PlayerBar>
       </div>
       
