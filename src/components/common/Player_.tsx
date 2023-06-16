@@ -16,6 +16,11 @@ import getTokenApi from '../../js/api/getToken';
 interface StyledType {
   isTopActive: boolean
 }
+interface BarStyledType {
+  isPlayBar: number
+  playBarPosition: number
+  isSeekingState:boolean
+}
 
 const Container = styled.div`
   position:relative;
@@ -70,6 +75,11 @@ const Container = styled.div`
   }
   .playerBarBox:hover .svgIcon{
     fill:#fff;
+  }
+  
+  .playerBarBox:hover > div > div{
+    opacity:1;
+    transition: all .13s ease;
   }
 `
 
@@ -152,6 +162,7 @@ const PlayTime = styled.span`
 `
 
 const BarOverBox = styled.div`
+  position: relative;
   width:100%;
   max-width:608px;
   height:4px;
@@ -167,9 +178,35 @@ const Barbox = styled.div`
   overflow:hidden;
 `
 // 이놈임 이녀석이 '그' Bar임
-const Bar = styled.a`
+const PlayBar = styled.a<BarStyledType>`
   display:block;
-  width:30%;
+  width:  100%;
+  // isPlayBar
+  height:100%;
+  border-radius: 2px;
+  background-color: #fff;
+  transform:translateX(-100%);
+  position: relative;
+  left:${(props) => (props.isSeekingState === true? props.isPlayBar : props.playBarPosition)}%;
+`
+
+const BarCircle = styled.div<BarStyledType>`
+  width:12px;
+  height:12px;
+  border-radius: 50%;
+  background-color: #fff;
+  position:absolute;
+  left:${(props) => (props.isSeekingState === true? props.isPlayBar : props.playBarPosition)}%;
+  top:50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  z-index:2;
+`
+
+const VolumeBar = styled.a`
+  display:block;
+  width:  40%;
+  // isPlayBar
   height:100%;
   border-radius: 2px;
   background-color: #fff;
@@ -272,17 +309,22 @@ export default function BottomPlayer() {
   // 볼륨 조절
   const [volume, setVolume] = useState('max')
   // mouseOver
+
   // const [mouseHover, setMouseHover] = useState('hsla(0,0%,100%,.7)')
 
   const [artistName, setArtistName] = useState<string>('');
   const [trackName, setTrackName] = useState<string>('');
   const [albumCover, setAlbumCover] = useState<string>('');
   const [isCoverToggle, setIsCoverToggle] = useState<any>(false);
+  const [isBarWidth, setIsBarWidth] = useState<number>(0);
   const [duration, setDuration] = useState<{min:number, sec:number}>({min:0, sec:0});
   const [playTime, setPlayTime] = useState<{min:number, sec:number}>({min:0, sec:0});
+  const [seekCirclePos, setSeekCirclePos] = useState<number>(0);
+  // const [seekCirclePos, setSeekCirclePos] = useState<{current:number, original:number}>({current:0, original:0});
   const [spotPlayer, setSpotPlayer] = useState<any>(null);
   const [isSdkReady, setIsSdkReady] = useState<boolean>(false);
   const [isPlay, setIsPlay] = useState<boolean>(false);
+  const [isSeeking, setIsSeeking] = useState<boolean>(false);
   // let  interval = useRef<number | undefined>();
 
   /* sdk 초기 셋팅 --------------------------------------*/
@@ -388,10 +430,12 @@ export default function BottomPlayer() {
         sec: Math.floor((state.duration / 1000) % 60)
       })
       
-      // setPlayTime({
-      //   min: Math.floor((state.position / 1000) / 60),
-      //   sec: Math.floor((state.position / 1000) % 60)
-      // })
+      setPlayTime({
+        min: Math.floor((state.position / 1000) / 60),
+        sec: Math.floor((state.position / 1000) % 60)
+      })
+
+      setIsBarWidth((state.position / state.duration) * 100)
     });
 
     /* 클릭 이벤트 */
@@ -424,55 +468,10 @@ export default function BottomPlayer() {
       })
     });
 
+    spotPlayer.seek(62 * 1000).then(state => {
+      console.log(state);
+    });
 
-
-    // spotPlayer.getCurrentState().then(state => {
-      
-    //   // let playTimeText = () => {
-    //   //   setPlayTime({
-    //   //     min: Math.floor((state.position / 1000) / 60),
-    //   //     sec: Math.floor((state.position / 1000) % 60)
-    //   //   })
-    //   //   console.log('play');
-    //   // }
-  
-    //   // console.log(state);
-
-    //   // let playIv = setInterval(() => {
-        
-    //   //   // if(state !== null && state.paused === false){
-    //   //   //   setPlayTime({
-    //   //   //     min: Math.floor((state.position / 1000) / 60),
-    //   //   //     sec: Math.floor((state.position / 1000) % 60)
-    //   //   //   })
-    //   //   //   console.log('play');
-          
-    //   //   // }else{
-    //   //   //   clearInterval(playIv);
-    //   //   //   console.log('pause');
-    //   //   // }
-    //   // }, 1000);
-    //   // return () => {
-    //   //   clearInterval(playIv);
-    //   // }
-
-    //   let playTimeText = () => {
-    //     setPlayTime({
-    //       min: Math.floor((state.position / 1000) / 60),
-    //       sec: Math.floor((state.position / 1000) % 60)
-    //     })
-    //     // console.log('play');
-    //     // console.log(isPlay);
-    //     // console.log(playTime);
-    //   }
-      
-      
-
-    //   interval.current = window.setInterval(playTimeText, 1000);
-    //   return () => {
-    //     clearInterval(interval.current);
-    //   }
-    // })
   }, [spotPlayer, playTrackInfo, isPlay, playTime]);
   
   
@@ -482,23 +481,16 @@ export default function BottomPlayer() {
       return;
     }
 
-    // spotPlayer.connect();
-
-    spotPlayer.getCurrentState().then(state => {
-      let playTimeText = () => {
+    let playTimeText = () => {
+      spotPlayer.getCurrentState().then(state => {
         setPlayTime({
           min: Math.floor((state.position / 1000) / 60),
           sec: Math.floor((state.position / 1000) % 60)
         })
 
-        // console.log(Math.floor((state.position / 1000) % 60));
-        // console.log('play');
-        // console.log(isPlay);
-        // console.log(playTime);
-        console.log(state);
-        
-        // console.log('test');
-      }
+        setIsBarWidth((state.position / state.duration) * 100)
+      })
+    }
       
       let interval;
       if(isPlay){
@@ -512,7 +504,6 @@ export default function BottomPlayer() {
         console.log(isPlay);
       }
       return () => clearInterval(interval);
-    })
   }, [spotPlayer, isPlay]); 
 
 
@@ -520,8 +511,29 @@ export default function BottomPlayer() {
     isCoverToggle? setIsCoverToggle(false) : setIsCoverToggle(true);
   }
 
+  let posX = 0;
+  const window_W = window.innerWidth;
+  const player_bar = document.getElementById('playerBarBox');
+  const bar_circle = document.getElementById('barCircle');
+  const bar_w = player_bar?.getBoundingClientRect().width;
+  const minPosX = (window_W - bar_w) / 2;
+  const maxPosX = ((window_W - bar_w) / 2) + bar_w;
+  const originalX = bar_circle?.getBoundingClientRect().x;
+  
+  const PlaySeekHandler = (e, type) => {
+    e.preventDefault();
+    e.stopPropagation();
+    posX = e.clientX;
+    posX = (Math.min(Math.max(posX - minPosX, 0), bar_w) / bar_w) * 100 ;
+    setSeekCirclePos(posX)
+    console.log(seekCirclePos);
+  }
+
   return (
-    <Container >
+    <Container  onDragEnter={(event) => PlaySeekHandler(event, 'enter')}
+                onDragOver={(event) => { return PlaySeekHandler(event, 'over')}} 
+                onDrop={(event) => PlaySeekHandler(event, 'drop')}
+                onDragLeave={(event) => PlaySeekHandler(event, 'leave')}>
       {/* 여기 나중에 컴포넌트로 각각 분리함 */}
       <NowPlaying>
         <TopAlbumCover isTopActive={isCoverToggle}>
@@ -574,14 +586,21 @@ export default function BottomPlayer() {
           </Btn>
         </BtnBox>
         <PlayerBar>
-          <PlayTime>{playTime.min}:{playTime.sec}</PlayTime>
-          <BarOverBox className='playerBarBox'>
+         <PlayTime>{playTime.min}:{playTime.sec < 10? '0' + playTime.sec : playTime.sec}</PlayTime>
+          <BarOverBox className='playerBarBox' id='playerBarBox'>
             <Barbox>
               {/* <Bar barWidth={barWidth}></Bar> */}
-              <Bar></Bar>
+              <PlayBar playBarPosition={seekCirclePos} isPlayBar={isBarWidth} isSeekingState={isSeeking}></PlayBar>
+              <BarCircle  id='barCircle'
+                          draggable 
+                          playBarPosition={seekCirclePos}
+                          isSeekingState={isSeeking}
+                          isPlayBar={isBarWidth}
+                          onClick={() => {isSeeking? setIsSeeking(true) : setIsSeeking(false);}}
+              ></BarCircle>
             </Barbox>
           </BarOverBox>
-          <PlayTime>{duration.min}:{duration.sec}</PlayTime>
+          <PlayTime>{duration.min}:{duration.sec < 10? '0' + duration.sec : duration.sec}</PlayTime>
         </PlayerBar>
       </div>
       
@@ -606,7 +625,7 @@ export default function BottomPlayer() {
             <RiVolumeMuteFill size='20' color={mouseHover}/>
           </Btn> */}
           <Barbox>
-            <Bar></Bar>
+            <VolumeBar></VolumeBar>
           </Barbox>
         </VolumeBox>
         <Btn title='전체화면'><BiFullscreen size='20' className={'svgIcon'}/></Btn>

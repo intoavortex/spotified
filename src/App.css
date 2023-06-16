@@ -28,6 +28,22 @@
   color: #61dafb;
 }
 
+input[type=range] {
+	width:100%;
+	-webkit-appearance: none;
+	background: transparent;
+  position: relative;
+  z-index:2;
+}
+
+input[type=range]:focus {
+  outline: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

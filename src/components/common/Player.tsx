@@ -165,8 +165,8 @@ const BarOverBox = styled.div`
   position: relative;
   width:100%;
   max-width:608px;
-  height:4px;
-  padding:10px 0;
+  /* height:4px; */
+  /* padding:10px 0; */
 `
 
 const Barbox = styled.div`
@@ -177,31 +177,90 @@ const Barbox = styled.div`
   border-radius: 2px;
   overflow:hidden;
 `
-// 이놈임 이녀석이 '그' Bar임
-const PlayBar = styled.a<BarStyledType>`
-  display:block;
-  width:  100%;
-  // isPlayBar
-  height:100%;
-  border-radius: 2px;
-  background-color: #fff;
-  transform:translateX(-100%);
+
+const PlayBar = styled.input`
+  width:100%;
+  background-color: transparent;
+  accent-color: #00fd0a;
+  margin:0;
   position: relative;
-  left:${(props) => (props.isSeekingState === true? props.isPlayBar : props.playBarPosition)}%;
+  z-index: 2;
+
+  &::-webkit-slider-runnable-track { 
+    width: 100%; height: 5px; 
+    /* padding:4px 0; */
+    margin:0;
+    cursor: pointer; 
+    /* box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;  */
+    background-color:hsla(0,0%,100%,.3);; 
+    border-radius: 6px; 
+    border: none; 
+    overflow:hidden;
+    box-sizing: border-box;
+  } 
+
+  &::-webkit-slider-thumb{
+    width:5px;
+    height:5px;
+    border-radius: 3px;
+    background-color: #fff;
+    position:relative;
+    /* top:-4px; */
+    opacity: 1;
+    /* z-index:2; */
+    /* border: 4px solid #f00; */
+    border:none;
+    
+    /* background:#fff url('//image.gsshop.com/ui/gsshop/cust/images/bg_size_slider.png') no-repeat 50% 50%;
+    background-size:14px auto;
+    border-radius:14px; */
+    /* box-shadow:0 2px 4px 0 rgba(158, 121, 121, 0.82); */
+    box-shadow: -704px 0 0 700px #fff;
+    -webkit-appearance:none;
+    transition: all .3s ease;
+  }
+
+  &::-moz-range-thumb{
+    -webkit-appearance: none;
+    width:100%;
+    height:100%;
+    background: #fff;
+    border: none;
+    border-radius:50%;
+    cursor: pointer;
+  }
+
+  &:hover::-webkit-slider-thumb{
+    background-color:#1ed760;
+    box-shadow: -703px 0 0 700px #1ed760;
+  }
 `
 
-const BarCircle = styled.div<BarStyledType>`
-  width:12px;
-  height:12px;
-  border-radius: 50%;
-  background-color: #fff;
-  position:absolute;
-  left:${(props) => (props.isSeekingState === true? props.isPlayBar : props.playBarPosition)}%;
-  top:50%;
-  transform: translateY(-50%);
-  opacity: 0;
-  z-index:2;
-`
+// // 이놈임 이녀석이 '그' Bar임
+// const PlayBar = styled.a<BarStyledType>`
+//   display:block;
+//   width:  100%;
+//   // isPlayBar
+//   height:100%;
+//   border-radius: 2px;
+//   background-color: #fff;
+//   transform:translateX(-100%);
+//   position: relative;
+//   left:${(props) => (props.isSeekingState === true? props.isPlayBar : props.playBarPosition)}%;
+// `
+
+// const BarCircle = styled.div<BarStyledType>`
+//   width:12px;
+//   height:12px;
+//   border-radius: 50%;
+//   background-color: #fff;
+//   position:absolute;
+//   left:${(props) => (props.isSeekingState === true? props.isPlayBar : props.playBarPosition)}%;
+//   top:50%;
+//   transform: translateY(-50%);
+//   opacity: 0;
+//   z-index:2;
+// `
 
 const VolumeBar = styled.a`
   display:block;
@@ -317,6 +376,8 @@ export default function BottomPlayer() {
   const [albumCover, setAlbumCover] = useState<string>('');
   const [isCoverToggle, setIsCoverToggle] = useState<any>(false);
   const [isBarWidth, setIsBarWidth] = useState<number>(0);
+  const [allDuration, setAllDuration] = useState<number>(0);
+  const [allPlayTime, setAllPlayTime] = useState<number>(0);
   const [duration, setDuration] = useState<{min:number, sec:number}>({min:0, sec:0});
   const [playTime, setPlayTime] = useState<{min:number, sec:number}>({min:0, sec:0});
   const [seekCirclePos, setSeekCirclePos] = useState<number>(0);
@@ -324,8 +385,10 @@ export default function BottomPlayer() {
   const [spotPlayer, setSpotPlayer] = useState<any>(null);
   const [isSdkReady, setIsSdkReady] = useState<boolean>(false);
   const [isPlay, setIsPlay] = useState<boolean>(false);
-  const [isSeeking, setIsSeeking] = useState<boolean>(false);
+  // const [isSeeking, setIsSeeking] = useState<boolean>(false);
   // let  interval = useRef<number | undefined>();
+
+
 
   /* sdk 초기 셋팅 --------------------------------------*/
   useEffect(() => {
@@ -398,6 +461,7 @@ export default function BottomPlayer() {
   //   });
   // }
 
+
   useEffect(() => {
     const initPlayer = async () => {
       if (!isSdkReady) {
@@ -419,12 +483,15 @@ export default function BottomPlayer() {
       if (!state) {
         return;
       }
+      
       // console.log(state);
       state.paused === true? setIsPlay(false) : setIsPlay(true); 
-
+      
       setTrackName(state.track_window.current_track.name === null? '':state.track_window.current_track.name);
       setArtistName(state.track_window.current_track.artists[0].name === null? '':state.track_window.current_track.artists[0].name);
       setAlbumCover(state.track_window.current_track.album.images[2].url === null? '':state.track_window.current_track.album.images[2].url);
+      setAllDuration(state.duration);
+      setAllPlayTime(state.position);
       setDuration({
         min: Math.floor((state.duration / 1000) / 60),
         sec: Math.floor((state.duration / 1000) % 60)
@@ -434,8 +501,15 @@ export default function BottomPlayer() {
         min: Math.floor((state.position / 1000) / 60),
         sec: Math.floor((state.position / 1000) % 60)
       })
+      
+      // let playBarValue = document.getElementById('playBarRange') as any
+      // playBarValue.value = state.position
 
-      setIsBarWidth((state.position / state.duration) * 100)
+      // console.log('value', playBarValue.value);
+      // console.log('state', state.position);
+      
+
+      // setIsBarWidth((state.position / state.duration) * 100)
     });
 
     /* 클릭 이벤트 */
@@ -468,27 +542,28 @@ export default function BottomPlayer() {
       })
     });
 
-    spotPlayer.seek(62 * 1000).then(state => {
-      console.log(state);
-    });
+    // spotPlayer.seek(62 * 1000).then(state => {
+    //   console.log(state);
+    // });
 
   }, [spotPlayer, playTrackInfo, isPlay, playTime]);
-  
   
   
   useEffect(() => { 
     if (!spotPlayer) {
       return;
     }
-
-    let playTimeText = () => {
+    function playTimeText() {
       spotPlayer.getCurrentState().then(state => {
         setPlayTime({
           min: Math.floor((state.position / 1000) / 60),
           sec: Math.floor((state.position / 1000) % 60)
         })
+        setAllPlayTime(state.position)
+        // let playBarValue = document.getElementById('playBarRange') as HTMLInputElement
+        // playBarValue.value = state.position
 
-        setIsBarWidth((state.position / state.duration) * 100)
+        // setIsBarWidth((state.position / state.duration) * 100)
       })
     }
       
@@ -526,7 +601,7 @@ export default function BottomPlayer() {
     posX = e.clientX;
     posX = (Math.min(Math.max(posX - minPosX, 0), bar_w) / bar_w) * 100 ;
     setSeekCirclePos(posX)
-    console.log(seekCirclePos);
+    // console.log(seekCirclePos);
   }
 
   return (
@@ -588,17 +663,18 @@ export default function BottomPlayer() {
         <PlayerBar>
          <PlayTime>{playTime.min}:{playTime.sec < 10? '0' + playTime.sec : playTime.sec}</PlayTime>
           <BarOverBox className='playerBarBox' id='playerBarBox'>
-            <Barbox>
+            <PlayBar type="range" id="playBarRange" min={0} max={allDuration} defaultValue={allPlayTime}/>
+            {/* <Barbox> */}
               {/* <Bar barWidth={barWidth}></Bar> */}
-              <PlayBar playBarPosition={seekCirclePos} isPlayBar={isBarWidth} isSeekingState={isSeeking}></PlayBar>
+              {/* <PlayBar playBarPosition={seekCirclePos} isPlayBar={isBarWidth} isSeekingState={isSeeking}></PlayBar>
               <BarCircle  id='barCircle'
                           draggable 
                           playBarPosition={seekCirclePos}
                           isSeekingState={isSeeking}
                           isPlayBar={isBarWidth}
                           onClick={() => {isSeeking? setIsSeeking(true) : setIsSeeking(false);}}
-              ></BarCircle>
-            </Barbox>
+              ></BarCircle> */}
+            {/* </Barbox> */}
           </BarOverBox>
           <PlayTime>{duration.min}:{duration.sec < 10? '0' + duration.sec : duration.sec}</PlayTime>
         </PlayerBar>
