@@ -542,6 +542,7 @@ export default function BottomPlayer() {
       })
     });
 
+    // TODO: 클릭했을 때 
     // spotPlayer.seek(62 * 1000).then(state => {
     //   console.log(state);
     // });
