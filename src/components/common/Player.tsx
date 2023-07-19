@@ -19,7 +19,6 @@ interface StyledType {
 interface BarStyledType {
   isPlayBar: number
   playBarPosition: number
-  isSeekingState:boolean
 }
 
 const Container = styled.div`
@@ -71,7 +70,8 @@ const Container = styled.div`
     transition: all .13s ease;
   }
   .playerBarBox:hover a{
-    background-color:#1ed760;
+    /* background-color:#1ed760; */
+    background-color:#feac00;
   }
   .playerBarBox:hover .svgIcon{
     fill:#fff;
@@ -181,7 +181,8 @@ const Barbox = styled.div`
 const PlayBar = styled.input`
   width:100%;
   background-color: transparent;
-  accent-color: #00fd0a;
+  /* accent-color: #00fd0a; */
+  accent-color: #feac00;
   margin:0;
   position: relative;
   z-index: 2;
@@ -231,8 +232,8 @@ const PlayBar = styled.input`
   }
 
   &:hover::-webkit-slider-thumb{
-    background-color:#1ed760;
-    box-shadow: -703px 0 0 700px #1ed760;
+    background-color:#feac00;
+    box-shadow: -703px 0 0 700px #feac00;
   }
 `
 
@@ -371,22 +372,23 @@ export default function BottomPlayer() {
 
   // const [mouseHover, setMouseHover] = useState('hsla(0,0%,100%,.7)')
 
-  const [artistName, setArtistName] = useState<string>('');
+  const [spotPlayer, setSpotPlayer] = useState<any>(null);
+  const [isCoverToggle, setIsCoverToggle] = useState<any>(false);
+
   const [trackName, setTrackName] = useState<string>('');
   const [albumCover, setAlbumCover] = useState<string>('');
-  const [isCoverToggle, setIsCoverToggle] = useState<any>(false);
-  const [isBarWidth, setIsBarWidth] = useState<number>(0);
+  const [artistName, setArtistName] = useState<string>('');
+
+  const [isSeeking, setIsSeeking] = useState<number>(0);
   const [allDuration, setAllDuration] = useState<number>(0);
   const [allPlayTime, setAllPlayTime] = useState<number>(0);
+  const [seekCirclePos, setSeekCirclePos] = useState<number>(0);
+  
+  const [isPlay, setIsPlay] = useState<boolean>(false);
+  const [isSdkReady, setIsSdkReady] = useState<boolean>(false);
+  
   const [duration, setDuration] = useState<{min:number, sec:number}>({min:0, sec:0});
   const [playTime, setPlayTime] = useState<{min:number, sec:number}>({min:0, sec:0});
-  const [seekCirclePos, setSeekCirclePos] = useState<number>(0);
-  // const [seekCirclePos, setSeekCirclePos] = useState<{current:number, original:number}>({current:0, original:0});
-  const [spotPlayer, setSpotPlayer] = useState<any>(null);
-  const [isSdkReady, setIsSdkReady] = useState<boolean>(false);
-  const [isPlay, setIsPlay] = useState<boolean>(false);
-  // const [isSeeking, setIsSeeking] = useState<boolean>(false);
-  // let  interval = useRef<number | undefined>();
 
 
 
@@ -502,7 +504,6 @@ export default function BottomPlayer() {
         sec: Math.floor((state.position / 1000) % 60)
       })
       
-      // let playBarValue = document.getElementById('playBarRange') as any
       // playBarValue.value = state.position
 
       // console.log('value', playBarValue.value);
@@ -543,9 +544,25 @@ export default function BottomPlayer() {
     });
 
     // TODO: 클릭했을 때 
-    // spotPlayer.seek(62 * 1000).then(state => {
-    //   console.log(state);
-    // });
+    spotPlayer.seek(isSeeking).then(state => {
+      console.log(state);
+      console.log('하하 머리 터져');
+      setDuration({
+        min: Math.floor((isSeeking / 1000) / 60),
+        sec: Math.floor((isSeeking / 1000) % 60)
+      })
+      
+      setPlayTime({
+        min: Math.floor((isSeeking / 1000) / 60),
+        sec: Math.floor((isSeeking / 1000) % 60)
+      })
+
+      // setPlayTime({
+      //   min: Math.floor((isSeeking / 1000) / 60),
+      //   sec: Math.floor((isSeeking / 1000) % 60)
+      // })
+      
+    });
 
   }, [spotPlayer, playTrackInfo, isPlay, playTime]);
   
@@ -582,6 +599,13 @@ export default function BottomPlayer() {
       return () => clearInterval(interval);
   }, [spotPlayer, isPlay]); 
 
+
+  let playBarValue = document.getElementById('playBarRange') as any // any??? 자존심 상해 ㅡㅡ
+  const durationSeekHandler = () => {
+    console.log('test test');
+    console.log(playBarValue.value);
+    setIsSeeking(playBarValue.value);
+  }
 
   const CoverHandler = () => {
     isCoverToggle? setIsCoverToggle(false) : setIsCoverToggle(true);
@@ -630,7 +654,7 @@ export default function BottomPlayer() {
         </TitleBox>
         <BtnBox>
           <LikeBtn onClick={() => likes === false? setLikes(true) : setLikes(false)}>
-            { likes === true ? <AiFillHeart size='20' color='#1ed760'/> : <AiOutlineHeart size='20' className={'svgIcon'}/> }
+            { likes === true ? <AiFillHeart size='20' color='#feac00'/> : <AiOutlineHeart size='20' className={'svgIcon'}/> }
           </LikeBtn>
           <LikeBtn><BsPip size='20' className={'svgIcon'}/></LikeBtn>
         </BtnBox>
@@ -640,7 +664,7 @@ export default function BottomPlayer() {
       <div>
         <BtnBox>
           <Btn title='무작위' onClick={() => shuffle === false? setShuffle(true) : setShuffle(false)}>
-            { shuffle === true ? <IoMdShuffle size='22' color='#1ed760'/> : <IoMdShuffle size='22' className={'svgIcon'}/> }
+            { shuffle === true ? <IoMdShuffle size='22' color='#feac00'/> : <IoMdShuffle size='22' className={'svgIcon'}/> }
           </Btn>
           <Btn title='이전곡'><AiFillStepBackward size='22' className={'svgIcon'}/></Btn>
           <Btn title='재생/일시정지' id="playerBtn">
@@ -657,14 +681,14 @@ export default function BottomPlayer() {
             if(repeat === 'one'){setRepeat('off')}
           }}>
             {repeat === 'off' && <TbRepeat size='22' className={'svgStrokeIcon'}/>}
-            {repeat === 'repeat' && <TbRepeat size='22' color='#1ed760'/>}
-            {repeat === 'one' && <TbRepeatOnce size='22' color='#1ed760'/>}
+            {repeat === 'repeat' && <TbRepeat size='22' color='#feac00'/>}
+            {repeat === 'one' && <TbRepeatOnce size='22' color='#feac00'/>}
           </Btn>
         </BtnBox>
         <PlayerBar>
          <PlayTime>{playTime.min}:{playTime.sec < 10? '0' + playTime.sec : playTime.sec}</PlayTime>
           <BarOverBox className='playerBarBox' id='playerBarBox'>
-            <PlayBar type="range" id="playBarRange" min={0} max={allDuration} defaultValue={allPlayTime}/>
+            <PlayBar type="range" id="playBarRange" min={0} max={allDuration} defaultValue={allPlayTime} onMouseUp={() => durationSeekHandler()}/>
             {/* <Barbox> */}
               {/* <Bar barWidth={barWidth}></Bar> */}
               {/* <PlayBar playBarPosition={seekCirclePos} isPlayBar={isBarWidth} isSeekingState={isSeeking}></PlayBar>

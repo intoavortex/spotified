@@ -71,7 +71,7 @@ const Container = styled.div`
     transition: all .13s ease;
   }
   .playerBarBox:hover a{
-    background-color:#1ed760;
+    background-color:#feac00;
   }
   .playerBarBox:hover .svgIcon{
     fill:#fff;
@@ -554,7 +554,7 @@ export default function BottomPlayer() {
         </TitleBox>
         <BtnBox>
           <LikeBtn onClick={() => likes === false? setLikes(true) : setLikes(false)}>
-            { likes === true ? <AiFillHeart size='20' color='#1ed760'/> : <AiOutlineHeart size='20' className={'svgIcon'}/> }
+            { likes === true ? <AiFillHeart size='20' color='#feac00'/> : <AiOutlineHeart size='20' className={'svgIcon'}/> }
           </LikeBtn>
           <LikeBtn><BsPip size='20' className={'svgIcon'}/></LikeBtn>
         </BtnBox>
@@ -564,7 +564,7 @@ export default function BottomPlayer() {
       <div>
         <BtnBox>
           <Btn title='무작위' onClick={() => shuffle === false? setShuffle(true) : setShuffle(false)}>
-            { shuffle === true ? <IoMdShuffle size='22' color='#1ed760'/> : <IoMdShuffle size='22' className={'svgIcon'}/> }
+            { shuffle === true ? <IoMdShuffle size='22' color='#feac00'/> : <IoMdShuffle size='22' className={'svgIcon'}/> }
           </Btn>
           <Btn title='이전곡'><AiFillStepBackward size='22' className={'svgIcon'}/></Btn>
           <Btn title='재생/일시정지' id="playerBtn">
@@ -581,8 +581,8 @@ export default function BottomPlayer() {
             if(repeat === 'one'){setRepeat('off')}
           }}>
             {repeat === 'off' && <TbRepeat size='22' className={'svgStrokeIcon'}/>}
-            {repeat === 'repeat' && <TbRepeat size='22' color='#1ed760'/>}
-            {repeat === 'one' && <TbRepeatOnce size='22' color='#1ed760'/>}
+            {repeat === 'repeat' && <TbRepeat size='22' color='#feac00'/>}
+            {repeat === 'one' && <TbRepeatOnce size='22' color='#feac00'/>}
           </Btn>
         </BtnBox>
         <PlayerBar>

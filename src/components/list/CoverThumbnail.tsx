@@ -48,7 +48,8 @@ const PlayBtn = styled.a`
   bottom:-48px; 
   width:48px;
   height:48px;
-  background-color:#65d36e;
+  /* background-color:#65d36e; */
+  background-color:#e89f00;
   border-radius:50%;
   z-index:2;
   opacity:0;
