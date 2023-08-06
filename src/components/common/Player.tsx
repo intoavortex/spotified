@@ -76,7 +76,7 @@ const Container = styled.div`
   .playerBarBox:hover .svgIcon{
     fill:#fff;
   }
-  
+
   .playerBarBox:hover > div > div{
     opacity:1;
     transition: all .13s ease;
@@ -187,18 +187,18 @@ const PlayBar = styled.input`
   position: relative;
   z-index: 2;
 
-  &::-webkit-slider-runnable-track { 
-    width: 100%; height: 5px; 
+  &::-webkit-slider-runnable-track {
+    width: 100%; height: 5px;
     /* padding:4px 0; */
     margin:0;
-    cursor: pointer; 
+    cursor: pointer;
     /* box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;  */
-    background-color:hsla(0,0%,100%,.3);; 
-    border-radius: 6px; 
-    border: none; 
+    background-color:hsla(0,0%,100%,.3);;
+    border-radius: 6px;
+    border: none;
     overflow:hidden;
     box-sizing: border-box;
-  } 
+  }
 
   &::-webkit-slider-thumb{
     width:5px;
@@ -211,7 +211,7 @@ const PlayBar = styled.input`
     /* z-index:2; */
     /* border: 4px solid #f00; */
     border:none;
-    
+
     /* background:#fff url('//image.gsshop.com/ui/gsshop/cust/images/bg_size_slider.png') no-repeat 50% 50%;
     background-size:14px auto;
     border-radius:14px; */
@@ -380,14 +380,18 @@ export default function BottomPlayer() {
   const [artistName, setArtistName] = useState<string>('');
 
   const [isSeeking, setIsSeeking] = useState<number>(0);
+  // 밀리세컨 계산 전 전체 트랙 시간
   const [allDuration, setAllDuration] = useState<number>(0);
+  // 밀리세컨 계산 전 현재 트랙 시간
   const [allPlayTime, setAllPlayTime] = useState<number>(0);
   const [seekCirclePos, setSeekCirclePos] = useState<number>(0);
-  
+
   const [isPlay, setIsPlay] = useState<boolean>(false);
   const [isSdkReady, setIsSdkReady] = useState<boolean>(false);
-  
+
+  // 트랙 시간(텍스트)
   const [duration, setDuration] = useState<{min:number, sec:number}>({min:0, sec:0});
+  // 현재 트랙 시간(텍스트)
   const [playTime, setPlayTime] = useState<{min:number, sec:number}>({min:0, sec:0});
 
 
@@ -397,14 +401,14 @@ export default function BottomPlayer() {
     const script = document.createElement('script');
     script.src = 'https://sdk.scdn.co/spotify-player.js';
     script.async = true;
-  
+
     document.body.appendChild(script);
 
     window.onSpotifyWebPlaybackSDKReady = () => {
       setIsSdkReady(true);
     }
   }, [])
-  
+
   /* 토큰 또 가져옴 또큰임 걍 */
   async function getToken(){
     const getToken = await getTokenApi();
@@ -469,9 +473,9 @@ export default function BottomPlayer() {
       if (!isSdkReady) {
         return null;
       }
-  
+
       const token = await getToken();
-  
+
       const player = new window.Spotify.Player({
         name: 'Web Playback SDK',
         getOAuthToken: (cb) => {
@@ -479,16 +483,16 @@ export default function BottomPlayer() {
         },
         volume: 1,
       });
-  
+
     /* 플레이어 상태가 변경될 때마다 */
     player.addListener('player_state_changed', (state) => {
       if (!state) {
         return;
       }
-      
+
       // console.log(state);
-      state.paused === true? setIsPlay(false) : setIsPlay(true); 
-      
+      state.paused === true? setIsPlay(false) : setIsPlay(true);
+
       setTrackName(state.track_window.current_track.name === null? '':state.track_window.current_track.name);
       setArtistName(state.track_window.current_track.artists[0].name === null? '':state.track_window.current_track.artists[0].name);
       setAlbumCover(state.track_window.current_track.album.images[2].url === null? '':state.track_window.current_track.album.images[2].url);
@@ -498,17 +502,17 @@ export default function BottomPlayer() {
         min: Math.floor((state.duration / 1000) / 60),
         sec: Math.floor((state.duration / 1000) % 60)
       })
-      
+
       setPlayTime({
         min: Math.floor((state.position / 1000) / 60),
         sec: Math.floor((state.position / 1000) % 60)
       })
-      
+
       // playBarValue.value = state.position
 
       // console.log('value', playBarValue.value);
       // console.log('state', state.position);
-      
+
 
       // setIsBarWidth((state.position / state.duration) * 100)
     });
@@ -543,31 +547,37 @@ export default function BottomPlayer() {
       })
     });
 
-    // TODO: 클릭했을 때 
-    spotPlayer.seek(isSeeking).then(state => {
-      console.log(state);
-      console.log('하하 머리 터져');
-      setDuration({
-        min: Math.floor((isSeeking / 1000) / 60),
-        sec: Math.floor((isSeeking / 1000) % 60)
-      })
-      
-      setPlayTime({
-        min: Math.floor((isSeeking / 1000) / 60),
-        sec: Math.floor((isSeeking / 1000) % 60)
-      })
+    // TODO: 클릭했을 때
+    spotPlayer.seek().then(state => {
+      console.log('ㅅㅂ');
 
-      // setPlayTime({
+      const DurationState = durationSeekHandler();
+      console.log(DurationState);
+      // console.log(isSeeking);
+      setIsSeeking(DurationState);
+
+
+      setAllPlayTime(DurationState)
+
+      // console.log(state);
+      // console.log('하하 머리 터져');
+      // setDuration({
       //   min: Math.floor((isSeeking / 1000) / 60),
       //   sec: Math.floor((isSeeking / 1000) % 60)
       // })
-      
+
+      setPlayTime({
+        min: Math.floor((DurationState / 1000) / 60),
+        sec: Math.floor((DurationState / 1000) % 60)
+      })
+
+
     });
 
   }, [spotPlayer, playTrackInfo, isPlay, playTime]);
-  
-  
-  useEffect(() => { 
+
+
+  useEffect(() => {
     if (!spotPlayer) {
       return;
     }
@@ -584,7 +594,7 @@ export default function BottomPlayer() {
         // setIsBarWidth((state.position / state.duration) * 100)
       })
     }
-      
+
       let interval;
       if(isPlay){
         interval = setInterval(playTimeText, 1000);
@@ -597,43 +607,45 @@ export default function BottomPlayer() {
         console.log(isPlay);
       }
       return () => clearInterval(interval);
-  }, [spotPlayer, isPlay]); 
+  }, [spotPlayer, isPlay]);
 
 
-  let playBarValue = document.getElementById('playBarRange') as any // any??? 자존심 상해 ㅡㅡ
+  let playBarValue = document.getElementById('playBarRange') as any // any???!?!? 멍청해서 죄송하다~~
   const durationSeekHandler = () => {
     console.log('test test');
     console.log(playBarValue.value);
-    setIsSeeking(playBarValue.value);
+    // setIsSeeking(playBarValue.value);
+    return playBarValue.value
   }
 
   const CoverHandler = () => {
     isCoverToggle? setIsCoverToggle(false) : setIsCoverToggle(true);
   }
 
-  let posX = 0;
-  const window_W = window.innerWidth;
-  const player_bar = document.getElementById('playerBarBox');
-  const bar_circle = document.getElementById('barCircle');
-  const bar_w = player_bar?.getBoundingClientRect().width;
-  const minPosX = (window_W - bar_w) / 2;
-  const maxPosX = ((window_W - bar_w) / 2) + bar_w;
-  const originalX = bar_circle?.getBoundingClientRect().x;
-  
-  const PlaySeekHandler = (e, type) => {
-    e.preventDefault();
-    e.stopPropagation();
-    posX = e.clientX;
-    posX = (Math.min(Math.max(posX - minPosX, 0), bar_w) / bar_w) * 100 ;
-    setSeekCirclePos(posX)
-    // console.log(seekCirclePos);
-  }
+  // let posX = 0;
+  // const window_W = window.innerWidth;
+  // const player_bar = document.getElementById('playerBarBox');
+  // const bar_circle = document.getElementById('barCircle');
+  // const bar_w = player_bar?.getBoundingClientRect().width;
+  // const minPosX = (window_W - bar_w) / 2;
+  // const maxPosX = ((window_W - bar_w) / 2) + bar_w;
+  // const originalX = bar_circle?.getBoundingClientRect().x;
+
+  // const PlaySeekHandler = (e, type) => {
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  //   posX = e.clientX;
+  //   posX = (Math.min(Math.max(posX - minPosX, 0), bar_w) / bar_w) * 100 ;
+  //   setSeekCirclePos(posX)
+  //   // console.log(seekCirclePos);
+  // }
 
   return (
-    <Container  onDragEnter={(event) => PlaySeekHandler(event, 'enter')}
-                onDragOver={(event) => { return PlaySeekHandler(event, 'over')}} 
-                onDrop={(event) => PlaySeekHandler(event, 'drop')}
-                onDragLeave={(event) => PlaySeekHandler(event, 'leave')}>
+    // <Container  onDragEnter={(event) => PlaySeekHandler(event, 'enter')}
+    //             onDragOver={(event) => { return PlaySeekHandler(event, 'over')}}
+    //             onDrop={(event) => PlaySeekHandler(event, 'drop')}
+    //             onDragLeave={(event) => PlaySeekHandler(event, 'leave')}>
+    <Container>
       {/* 여기 나중에 컴포넌트로 각각 분리함 */}
       <NowPlaying>
         <TopAlbumCover isTopActive={isCoverToggle}>
@@ -668,9 +680,9 @@ export default function BottomPlayer() {
           </Btn>
           <Btn title='이전곡'><AiFillStepBackward size='22' className={'svgIcon'}/></Btn>
           <Btn title='재생/일시정지' id="playerBtn">
-            {isPlay === false ? 
+            {isPlay === false ?
               <HiPlay size='40' color='#fff'/> :
-              <HiPause size='40' color='#fff'/> 
+              <HiPause size='40' color='#fff'/>
             }
           </Btn>
           <Btn title='다음곡'><AiFillStepForward size='22' className={'svgIcon'}/></Btn>
@@ -693,7 +705,7 @@ export default function BottomPlayer() {
               {/* <Bar barWidth={barWidth}></Bar> */}
               {/* <PlayBar playBarPosition={seekCirclePos} isPlayBar={isBarWidth} isSeekingState={isSeeking}></PlayBar>
               <BarCircle  id='barCircle'
-                          draggable 
+                          draggable
                           playBarPosition={seekCirclePos}
                           isSeekingState={isSeeking}
                           isPlayBar={isBarWidth}
@@ -704,7 +716,7 @@ export default function BottomPlayer() {
           <PlayTime>{duration.min}:{duration.sec < 10? '0' + duration.sec : duration.sec}</PlayTime>
         </PlayerBar>
       </div>
-      
+
       {/* 여기 나중에 컴포넌트로 각각 분리함 */}
       <BtnBoxRight>
         <Btn title='가사'><MdOutlineLyrics size='20' className={'svgIcon'}/></Btn>
@@ -734,4 +746,3 @@ export default function BottomPlayer() {
     </Container>
   );
 }
-
