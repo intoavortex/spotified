@@ -151,7 +151,6 @@ export default function PlayInfo() {
     isCoverToggle? setIsCoverToggle(false) : setIsCoverToggle(true);
   }
 
-
   return (
     <Container>
       <TopAlbumCover isTopActive={isCoverToggle}>

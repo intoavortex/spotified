@@ -1,9 +1,9 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import styled from 'styled-components';
 
-import PlayInfo from '../player/components/PlayInfo'
-import TrackBar from '../player/components/TrackBar'
-import PlayControl from '../player/components/PlayControl'
+import PlayInfo from '../player/layout/PlayInfo'
+import TrackBar from '../player/layout/TrackBar'
+import PlayControl from '../player/layout/PlayControl'
 
 const Container = styled.div`
   position:relative;
