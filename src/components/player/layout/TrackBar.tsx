@@ -1,11 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 
-import { AiFillStepForward, AiFillStepBackward } from 'react-icons/ai';
-import { IoMdShuffle } from 'react-icons/io';
-import { HiPlay, HiPause } from 'react-icons/hi';
-import { TbRepeatOnce, TbRepeat } from 'react-icons/tb';
-
 import BarComponent from "../components/BarComponent";
 import BtnComponent from "../components/BtnComponent";
 
@@ -15,12 +10,6 @@ const BtnBox = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-`
-
-const Btn = styled.button`
-  background-color: transparent;
-  border:none;
-  cursor: pointer;
 `
 
 const PlayerBar = styled.div`

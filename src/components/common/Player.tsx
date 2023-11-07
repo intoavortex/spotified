@@ -1,9 +1,12 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 
 import PlayInfo from '../player/layout/PlayInfo'
 import TrackBar from '../player/layout/TrackBar'
 import PlayControl from '../player/layout/PlayControl'
+
+import getTokenApi from '../../js/api/getToken';
 
 const Container = styled.div`
   position:relative;
@@ -66,8 +69,8 @@ const Container = styled.div`
     transition: all .13s ease;
   }
 `
-export default function BottomPlayer() {
 
+export default function Player() {
   return (
     <Container>
       <PlayInfo />

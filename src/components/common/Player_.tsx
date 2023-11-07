@@ -332,14 +332,6 @@ const LeftCoverBtn = styled.div<StyledType>`
   }
 `
 
-/**
- * player component split
- * let / middle / right
- * minimum function component
- * state -> store (toolkit tlqkf)
- *
- */
-
 export default function BottomPlayer() {
   // 좋아요
   const [likes, setLikes] = useState(false)
@@ -489,13 +481,6 @@ export default function BottomPlayer() {
         sec: Math.floor((state.position / 1000) % 60)
       })
 
-      // playBarValue.value = state.position
-
-      // console.log('value', playBarValue.value);
-      // console.log('state', state.position);
-
-
-      // setIsBarWidth((state.position / state.duration) * 100)
     });
 
     /* 클릭 이벤트 */
