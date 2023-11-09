@@ -70,7 +70,55 @@ const Container = styled.div`
   }
 `
 
-export default function Player() {
+const track = {
+  name: "",
+  album: {
+      images: [
+          { url: "" }
+      ]
+  },
+  artists: [
+      { name: "" }
+  ]
+}
+
+export default function Player(props) {
+  const [is_paused, setPaused] = useState(false);
+  const [is_active, setActive] = useState(false);
+  const [sdkPlayer, setSdkPlayer] = useState(undefined);
+  const [current_track, setTrack] = useState(track);
+
+  useEffect(() => {
+
+      const script = document.createElement("script");
+      script.src = "https://sdk.scdn.co/spotify-player.js";
+      script.async = true;
+
+      document.body.appendChild(script);
+
+      window.onSpotifyWebPlaybackSDKReady = () => {
+
+          const player = new window.Spotify.Player({
+              name: 'Web Playback SDK',
+              getOAuthToken: cb => { cb(props.token); },
+              volume: 0.5
+          });
+
+          setSdkPlayer(player);
+
+          player.addListener('ready', ({ device_id }) => {
+              console.log('Ready with Device ID', device_id);
+          });
+
+          player.addListener('not_ready', ({ device_id }) => {
+              console.log('Device ID has gone offline', device_id);
+          });
+
+          player.connect();
+
+      };
+  }, []);
+
   return (
     <Container>
       <PlayInfo />

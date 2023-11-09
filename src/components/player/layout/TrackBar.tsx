@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 
-import BarComponent from "../components/BarComponent";
-import BtnComponent from "../components/BtnComponent";
+import BarComponent from "../components/Bars/VolumeBar";
+import ShuffleButton from "../components/buttons/ShuffleButton";
+import BackwardButton from "../components/buttons/BackwardButton";
+import FowardButton from "../components/buttons/FowardButton";
+import PlayButton from "../components/buttons/PlayButton";
+import RepeatButton from "../components/buttons/RepeatButton";
 
 const BtnBox = styled.div`
   display: flex;
@@ -39,15 +43,15 @@ export default function TrackBar() {
     <div>
       <BtnBox>
         {/* 무작위 재생 */}
-        <BtnComponent btnFnc={'shuffleTrack'}/>
+        <ShuffleButton />
         {/* 이전 트랙 재생 */}
-        <BtnComponent btnFnc={'backwardTrack'}/>
+        <BackwardButton />
         {/* 재생 일시정지 */}
-        <BtnComponent btnFnc={'playTrack'}/>
+        <PlayButton />
         {/* 다음 트랙 재생 */}
-        <BtnComponent btnFnc={'fowardTrack'}/>
+        <FowardButton />
         {/* 반복 */}
-        <BtnComponent btnFnc={'repeatTrack'}/>
+        <RepeatButton />
       </BtnBox>
 
       <PlayerBar>

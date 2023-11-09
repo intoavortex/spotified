@@ -1,89 +1,163 @@
-// import { useEffect, useState } from 'react';
-// import axios from 'axios';
 import styled from 'styled-components';
-
-import { MdHomeFilled } from 'react-icons/md';
-
-import logo from '../../logo.svg';
-// import getTokenApi from '../../js/api/getToken';
+import { SlArrowLeft, SlArrowRight } from 'react-icons/sl';
+import { BiUser } from 'react-icons/bi';
+import { RxTriangleDown, RxExternalLink, RxTriangleUp } from 'react-icons/rx';
+import { useState } from 'react';
 
 const Container = styled.div`
-  width:400px;
-  height:calc(100vh - 90px);
-  background-color:#000;
-  padding-top:24px;
+  position:relative;
+  padding:16px 32px;
+  height:64px;
   box-sizing: border-box;
+`
+
+const FlexContainer = styled.div`
+  display:flex;
+  flex-wrap:wrap;
+  flex-direction:row;
+  justify-content: space-between;
+  align-items:center;
+`
+
+const HistoryBtnBox = styled.div`
+  display:flex;
+  gap:16px;
+`
+
+const Btn = styled.a`
+  display:flex;
+  flex-wrap:wrap;
+  flex-direction:row;
+  justify-content:center;
+  align-items:center;
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background-color:rgba(0,0,0,.7);
+`
+
+const UserBtn = styled.a`
+  display:flex;
+  flex-wrap:wrap;
+  flex-direction:row;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  padding:2px;
+  border-radius:23px;
+  box-sizing:border-box;
+  background-color:black;
+`
+
+const UserIcon = styled.span`
+  display:flex;
+  flex-direction:row;
+  justify-content:center;
+  align-items:center;
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  background-color:#535353;
+  margin-left:2px;
+`
+
+const UserId = styled.span`
+  display:inline-block;
+  max-width:110px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height:32px;
+  font-size:14px;
+  font-weight:bold;
+  color:#fff;
+`
+
+const ArrowIcon = styled.span`
+  display:inline-block;
+  margin-right:6px;
+`
+
+const MoreInfo = styled.div`
+  position:absolute;
+  right:32px;
+  top:63px;
+  width:196px;
+  padding:4px;
+  border-radius:4px;
+  background-color:#282828;
+  box-sizing:border-box;
+  box-shadow: 0 16px 24px rgba(0,0,0,.3), 0 6px 8px rgba(0,0,0,.2);
+  z-index:2;
+`
+
+const BtnGroup = styled.div`
   display:flex;
   flex-direction:column;
-  flex-wrap: wrap;
-  align-content: space-between;
-  justify-content: space-between;
-`
-
-const Logo = styled.a`
-  display:block;
-  width:130px;
-  margin-left:24px;
-  img{
-    width:100%;
-  }
-`
-
-const MenuGroup = styled.div`
-  padding:0 24px;
-`
-
-const Menu = styled.ul`
   text-align:left;
-  margin-top:24px;
+  border-bottom:1px solid hsla(0,0%,100%,.1);
 `
 
-const MenuBtn = styled.li`
-  color:#b3b3b3;
+const Link = styled.a`
+  display:flex;
+  flex-direction:row;
+  justify-content: space-between;
+  align-items:center;
   height:40px;
+  padding:0 8px 0 12px;
+  line-height:40px;
   font-size:14px;
-  &.active{
-    color:#fff;
+  color:hsla(0,0%,100%,.9);
+  text-decoration:none;
+  text-align:left;
+  box-sizing:border-box;
+  &:hover{
+    background-color:hsla(0,0%,100%,.1);
   }
 `
-const Line = styled.hr`
-  background-color:#282828;
-  border:none;
-  height:1px;
-`
 
-// const AlbumCover = styled.div`
-//   width:100%;
-//   img{width:100%;}
-// `
-
-
-export default function Header() {
+function ContainerHeader() {
+  const [userInfo, setUserInfo] = useState(false);
   return (
     <Container>
-      <div>
-        <Logo>
-          <img src={logo} alt="LOGO"/>
-        </Logo>
-        <MenuGroup>
-          <Menu>
-            <MenuBtn className={'active'}>
-              <MdHomeFilled />
-              <span> 홈 </span>
-            </MenuBtn>
-            <MenuBtn>검색</MenuBtn>
-            <MenuBtn>내 라이브러리</MenuBtn>
-          </Menu>
-          <Menu>
-            <MenuBtn>플레이리스트 만들기</MenuBtn>
-            <MenuBtn>좋아요 표시한 곡</MenuBtn>
-          </Menu>
-          <Line />
-          <Menu>
-            <MenuBtn>내가 만든 플레이리스트ty</MenuBtn>
-          </Menu>
-        </MenuGroup>
-      </div>
+      <FlexContainer>
+        <HistoryBtnBox>
+          <Btn href={'#none'} title="뒤로 가기">
+            <SlArrowLeft color='white'/>
+          </Btn>
+          <Btn href={'#none'} title="앞으로 가기">
+            <SlArrowRight color='white'/>
+          </Btn>
+        </HistoryBtnBox>
+        <UserBtn onClick={() => userInfo === false? setUserInfo(true) : setUserInfo(false)}>
+          <UserIcon><BiUser size='18' color='white'/></UserIcon>
+          <UserId>vouxx</UserId>
+          <ArrowIcon>
+            { userInfo === false? <RxTriangleDown size='20' color='white'/> : <RxTriangleUp size='20' color='white'/> }
+          </ArrowIcon>
+        </UserBtn>
+      </FlexContainer>
+      { userInfo === true &&
+        <MoreInfo>
+          <BtnGroup>
+            <Link href='http://localhost:8888/login' target='_blank' title='계정'>
+              {/* <span>계정</span> */}
+              <span>로그인</span>
+              <RxExternalLink size='17'/>
+            </Link>
+            <Link href='http://localhost:8888/access-token' target='_blank' title='프로필'>
+              {/* <span>프로필</span> */}
+              <span>토큰 발급</span>
+            </Link>
+            <Link href='' title='설정'>
+              <span>설정</span>
+            </Link>
+          </BtnGroup>
+          <Link href='' title='로그아웃'>로그아웃</Link>
+        </MoreInfo>
+      }
     </Container>
   );
 }
+
+export default ContainerHeader;

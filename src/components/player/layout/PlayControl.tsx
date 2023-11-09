@@ -1,7 +1,12 @@
 import styled from 'styled-components';
 import { useState } from 'react';
 
-import BtnComponent from "../components/BtnComponent";
+import LyricsButton from "../components/buttons/LyricsButton";
+import PlayListButton from "../components/buttons/PlayListButton";
+import DeviceConnectButton from "../components/buttons/DeviceConnectButton";
+import VolumeButton from "../components/buttons/VolumeButton";
+import FullScreenButton from "../components/buttons/FullScreenButton";
+import BarComponent from "../components/Bars/VolumeBar";
 
 const Container = styled.div`
   display: flex;
@@ -43,17 +48,15 @@ const VolumeBox = styled.div`
 export default function PlayControl() {
   return (
     <Container>
-      <BtnComponent btnFnc={'lyrics'} />
-      <BtnComponent btnFnc={'playList'} />
-      <BtnComponent btnFnc={'deviceConnect'} />
+      <LyricsButton />
+      <PlayListButton />
+      <DeviceConnectButton />
 
       <VolumeBox className='playerBarBox'>
-        <BtnComponent btnFnc={'volume'} />
-        <Barbox>
-          <VolumeBar></VolumeBar>
-        </Barbox>
+        <VolumeButton />
+        <BarComponent/>
       </VolumeBox>
-      <BtnComponent btnFnc={'fullscreen'} />
+      <FullScreenButton />
     </Container>
   );
 }

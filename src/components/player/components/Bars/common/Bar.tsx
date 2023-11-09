@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import styled from 'styled-components';
 
 const BarOverBox = styled.div`
@@ -17,6 +16,8 @@ const PlayBar = styled.input`
   margin:0;
   position: relative;
   z-index: 2;
+  display:inline-block;
+  vertical-align: middle;
 
   &::-webkit-slider-runnable-track {
     width: 100%; height: 5px;
@@ -67,13 +68,18 @@ const PlayBar = styled.input`
     box-shadow: -703px 0 0 700px #feac00;
   }
 `
+interface Iprops {
+  minValue: number,
+  maxValue: number,
+  defaultValue: number,
+  onMouseUp: React.MouseEventHandler
+}
 
-
-export default function BarComponent() {
+export default function Bar({minValue , maxValue, onMouseUp, defaultValue}:Iprops) {
 
   return (
     <BarOverBox className='playerBarBox' id='playerBarBox'>
-      <PlayBar type="range" id="playBarRange" min={0} max={100} defaultValue={0} onMouseUp={() => console.log('test')}/>
+      <PlayBar type="range" id="playBarRange" min={minValue} max={maxValue} defaultValue={defaultValue} onMouseUp={onMouseUp}/>
     </BarOverBox>
   );
 }

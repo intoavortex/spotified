@@ -1,8 +1,10 @@
 import React from 'react';
 // import logo from './logo.svg';
+import { useEffect, useState } from 'react';
+
 import './App.css';
-import BottomPlayer from './components/common/Player';
-import Header from './components/common/Header';
+import Player from './components/common/Player';
+import SideList from './components/common/SideList';
 import Container from './container/common/Container'
 
 import styled from 'styled-components';
@@ -16,22 +18,32 @@ const Wrap = styled.div`
   overflow:hidden;
 `
 
-// const App = () => (
-//   <React.Fragment>
-//     <Reset />
-//     <div>Hi, I'm an app!</div>
-//   </React.Fragment>
-// )
 
 function App() {
+  const [token, setToken] = useState('');
+
+  useEffect(() => {
+
+    async function getToken() {
+      const response = await fetch('http://localhost:8888/access-token');
+      const json = await response.json();
+      setToken(json.access_token);
+    }
+
+    getToken();
+
+  }, []);
+
   return (
     <>
       <Reset />
-      <Wrap className="App">
-        <Header />
-        <Container />
-        <BottomPlayer />
-      </Wrap>
+      { (token === '') ? '로그인하시게' :
+        <Wrap className="App">
+          <SideList />
+          <Container />
+          <Player token={token}/>
+        </Wrap>
+      }
     </>
   );
 }

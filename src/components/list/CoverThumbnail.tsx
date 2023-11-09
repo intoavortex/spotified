@@ -45,7 +45,7 @@ const ImgBox = styled.div`
 const PlayBtn = styled.a`
   position:absolute;
   right:8px;
-  bottom:-48px; 
+  bottom:-48px;
   width:48px;
   height:48px;
   /* background-color:#65d36e; */
@@ -78,7 +78,7 @@ const Desc = styled.a`
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2; 
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   line-height:22.4px;
   font-size:14px;
@@ -90,7 +90,7 @@ const Desc = styled.a`
 
 function CoverThumbnail() {
 
-  
+
   return (
     <Container>
       <ImgBox>
@@ -99,7 +99,7 @@ function CoverThumbnail() {
       </ImgBox>
       <TextBox>
         <Title>Pretender</Title>
-        <Desc>머시저시 제목머시저시 제목머시저시 제목머시저시 제목머시저시 제목머시저시 제목머시저시 제목</Desc>
+        <Desc>어쩌구 저쩌구 어쩌구 저쩌구</Desc>
       </TextBox>
     </Container>
   );

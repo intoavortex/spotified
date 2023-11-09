@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import ContainerHeader from "../../components/common/ContainerHeader";
+import Header from "../../components/common/Header";
 import CoverThumbnailList from "../../components/list/CoverThumbnailList";
 
 const Wrap = styled.div`
@@ -49,7 +49,7 @@ const Contents = styled.div`
 export function Container() {
   return(
     <Wrap>
-      <ContainerHeader />
+      <Header />
       <ContentCotainer>
         <Contents>
           <CoverThumbnailList title={'아니 기능 할 거'}/>

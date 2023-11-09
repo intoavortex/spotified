@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 
-import BtnComponent from '../components/BtnComponent'
-import AlbumCoverComponent from '../components/AlbumCoverComponent'
+import LikeButton from "../components/buttons/LikeButton";
+import PIPButton from "../components/buttons/PIPButton";
+import AlbumCover from '../components/AlbumCover'
+import ThumbnailCover from '../components/ThumbnailCover'
 
 const Container = styled.div`
   display: flex;
@@ -67,8 +69,8 @@ export default function PlayInfo() {
 
   return (
     <Container>
-      <AlbumCoverComponent coverPosition={'top'} />
-      <AlbumCoverComponent coverPosition={'left'} />
+      <AlbumCover />
+      <ThumbnailCover />
 
       <TitleBox>
         <Title>{trackName}</Title>
@@ -76,8 +78,8 @@ export default function PlayInfo() {
       </TitleBox>
 
       <BtnBox>
-        <BtnComponent btnFnc={'likes'}/>
-        <BtnComponent btnFnc={'pip'}/>
+        <LikeButton />
+        <PIPButton />
       </BtnBox>
 
     </Container>
