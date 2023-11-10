@@ -41,6 +41,7 @@ function App() {
         <Wrap className="App">
           <SideList />
           <Container />
+          {/* <Player /> */}
           <Player token={token}/>
         </Wrap>
       }

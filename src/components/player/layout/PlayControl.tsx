@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import axios from 'axios';
 
 import LyricsButton from "../components/buttons/LyricsButton";
 import PlayListButton from "../components/buttons/PlayListButton";
@@ -45,7 +46,20 @@ const VolumeBox = styled.div`
   margin-right:4px;
 `
 
-export default function PlayControl() {
+export default function PlayControl({ sdkPlayer }) {
+  useEffect(() => {
+    if (!sdkPlayer) {
+      return;
+    }
+    sdkPlayer.connect();
+
+    /* 플레이어 상태가 변경될 때마다 */
+    sdkPlayer.addListener('ready', ({ device_id }) => {
+      console.log('The Web Playback SDK is ready to play music!');
+      console.log('Device ID', device_id);
+    })
+  }, [sdkPlayer]);
+
   return (
     <Container>
       <LyricsButton />

@@ -457,44 +457,47 @@ export default function BottomPlayer() {
         volume: 1,
       });
 
-    /* 플레이어 상태가 변경될 때마다 */
-    player.addListener('player_state_changed', (state) => {
-      if (!state) {
-        return;
-      }
+      /* 플레이어 상태가 변경될 때마다 */
+      player.addListener('player_state_changed', (state) => {
+        if (!state) {
+          return;
+        }
 
-      // console.log(state);
-      state.paused === true? setIsPlay(false) : setIsPlay(true);
+        // console.log(state);
+        state.paused === true? setIsPlay(false) : setIsPlay(true);
 
-      setTrackName(state.track_window.current_track.name === null? '':state.track_window.current_track.name);
-      setArtistName(state.track_window.current_track.artists[0].name === null? '':state.track_window.current_track.artists[0].name);
-      setAlbumCover(state.track_window.current_track.album.images[2].url === null? '':state.track_window.current_track.album.images[2].url);
-      setAllDuration(state.duration);
-      setAllPlayTime(state.position);
-      setDuration({
-        min: Math.floor((state.duration / 1000) / 60),
-        sec: Math.floor((state.duration / 1000) % 60)
-      })
+        setTrackName(state.track_window.current_track.name === null? '':state.track_window.current_track.name);
+        setArtistName(state.track_window.current_track.artists[0].name === null? '':state.track_window.current_track.artists[0].name);
+        setAlbumCover(state.track_window.current_track.album.images[2].url === null? '':state.track_window.current_track.album.images[2].url);
+        setAllDuration(state.duration);
+        setAllPlayTime(state.position);
+        setDuration({
+          min: Math.floor((state.duration / 1000) / 60),
+          sec: Math.floor((state.duration / 1000) % 60)
+        })
 
-      setPlayTime({
-        min: Math.floor((state.position / 1000) / 60),
-        sec: Math.floor((state.position / 1000) % 60)
-      })
+        setPlayTime({
+          min: Math.floor((state.position / 1000) / 60),
+          sec: Math.floor((state.position / 1000) % 60)
+        })
 
-    });
+      });
 
-    /* 클릭 이벤트 */
-    const playBtn = document.getElementById('playerBtn');
-    playBtn.addEventListener('click', () => {
-      player.togglePlay();
-      // console.log(isPlay);
-    });
+      /* 클릭 이벤트 */
+      const playBtn = document.getElementById('playerBtn');
+      playBtn.addEventListener('click', () => {
+        player.togglePlay();
+        // console.log(isPlay);
+      });
 
       setSpotPlayer(player);
     }
 
     initPlayer();
   }, [isSdkReady]);
+
+
+  console.log(typeof spotPlayer);
 
   useEffect(() => {
     if (!spotPlayer) {
