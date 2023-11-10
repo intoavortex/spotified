@@ -88,13 +88,13 @@ export default function Player(props) {
 
   useEffect(() => {
 
-      const script = document.createElement("script");
-      script.src = "https://sdk.scdn.co/spotify-player.js";
-      script.async = true;
 
-      document.body.appendChild(script);
+    window.onSpotifyWebPlaybackSDKReady = () => {
+        const script = document.createElement("script");
+        script.src = "https://sdk.scdn.co/spotify-player.js";
+        script.async = true;
 
-      window.onSpotifyWebPlaybackSDKReady = () => {
+        document.body.appendChild(script);
 
           const player = new window.Spotify.Player({
               name: 'Web Playback SDK',
