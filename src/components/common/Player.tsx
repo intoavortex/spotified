@@ -83,10 +83,8 @@ const track = {
 }
 
 export default function Player(props) {
-  const [is_paused, setPaused] = useState(false);
-  const [is_active, setActive] = useState(false);
   const [sdkPlayer, setSdkPlayer] = useState(undefined);
-  const [current_track, setTrack] = useState(track);
+  const [isSdkReady, setIsSdkReady] = useState<boolean>(false);
 
   useEffect(() => {
 
@@ -117,7 +115,36 @@ export default function Player(props) {
           player.connect();
 
       };
+
   }, []);
+
+  // useEffect(() => {
+  //   const initPlayer = async () => {
+  //     if (!isSdkReady) {
+  //       return null;
+  //     }
+
+  //     const token = await getToken();
+
+  //     const player = new window.Spotify.Player({
+  //       name: 'Web Playback SDK',
+  //       getOAuthToken: (cb) => {
+  //         cb(token);
+  //       },
+  //       volume: 1,
+  //     });
+
+  //   /* 플레이어 상태가 변경될 때마다 */
+  //   player.addListener('player_state_changed', (state) => {
+  //     if (!state) {
+  //       return;
+  //     }
+  //   });
+  //   setSdkPlayer(player);
+  //   }
+
+  //   initPlayer();
+  // }, [isSdkReady]);
 
   return (
     <Container>

@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import LikeButton from "../components/buttons/LikeButton";
 import PIPButton from "../components/buttons/PIPButton";
 import AlbumCover from '../components/AlbumCover'
-import ThumbnailCover from '../components/ThumbnailCover'
 
 const Container = styled.div`
   display: flex;
@@ -70,7 +69,6 @@ export default function PlayInfo() {
   return (
     <Container>
       <AlbumCover />
-      <ThumbnailCover />
 
       <TitleBox>
         <Title>{trackName}</Title>
