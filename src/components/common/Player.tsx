@@ -1,9 +1,8 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from "react-redux"
-import { RootState } from "../../reducer/index";
+import { RootState } from "../../types/Type";
 import { SDKREADY } from "../../slices/SdkReady";
 import styled from 'styled-components';
-import axios from 'axios';
 
 import PlayInfo from '../player/layout/PlayInfo'
 import TrackBar from '../player/layout/TrackBar'
@@ -72,10 +71,10 @@ const Container = styled.div`
 `
 
 const Player = (props) => {
-  const isSdkReady =useSelector( (state: RootState) => state.SdkReady.isSdkReady)
-
+  const isSdkReady = useSelector((state: RootState) => state.SdkReady.isSdkReady);
   const dispatch = useDispatch();
   const [sdkPlayer, setSdkPlayer] = useState(null);
+
 
   useEffect(() => {
     const script = document.createElement('script');
@@ -85,45 +84,49 @@ const Player = (props) => {
     document.body.appendChild(script);
 
     window.onSpotifyWebPlaybackSDKReady = () => {
-      dispatch(SDKREADY())
+      dispatch(SDKREADY(true));
+      console.log('ready');
     };
   }, []);
 
   const initPlayer = async () => {
-    if (!isSdkReady) {
-      return null;
-    }
-
     try {
-      const token = await props.token;
+      if (!props.token) {
+        console.error('Token is undefined.');
+        return;
+      }
 
+      const token = props.token; // 문자열로 받아왔다면 그대로 사용
+
+      // player 객체 생성
       const player = new window.Spotify.Player({
         name: 'zei Spotify Web SDK',
-        getOAuthToken: (cb) => {
-          cb(token);
+        getOAuthToken: async (cb) => {
+          await cb(token);
         },
         volume: 1,
       });
-      setSdkPlayer(player);
 
-      console.log('ready')
-      /**
-       * promise는 state에 담지 말기
-       */
+      // sdkPlayer 상태에 player 설정
+      setSdkPlayer(player);
+      console.log(sdkPlayer);
+
     } catch (error) {
       console.error('Error initializing player:', error);
     }
   };
 
   useEffect(() => {
-    initPlayer();
+    if (isSdkReady) {
+      initPlayer();
+    }
   }, [isSdkReady, props.token]);
 
   return (
     <Container>
       <PlayInfo />
       <TrackBar />
-      <PlayControl sdkPlayer={sdkPlayer} />
+      <PlayControl player={'sdkPlayer'}/>
     </Container>
   );
 }

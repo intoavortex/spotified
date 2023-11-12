@@ -6,8 +6,8 @@ const SdkReadySlice = createSlice({
     isSdkReady: false
   },
   reducers:{
-    SDKREADY (state){
-      state.isSdkReady = true;
+    SDKREADY (state, action){
+      state.isSdkReady = action.payload
     },
   }
 });

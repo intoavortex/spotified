@@ -1,10 +1,11 @@
 import { combineReducers } from 'redux';
 import SdkReadySlice from "../slices/SdkReady";
+import SdkPlayerSlice from "../slices/SdkPlayer";
 
 const Reducer = combineReducers({
   SdkReady: SdkReadySlice.reducer,
+  SdkPlayer: SdkPlayerSlice.reducer,
 });
 
 
-export type RootState = ReturnType<typeof Reducer>;
 export default Reducer;

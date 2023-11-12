@@ -46,19 +46,19 @@ const VolumeBox = styled.div`
   margin-right:4px;
 `
 
-export default function PlayControl({ sdkPlayer }) {
-  useEffect(() => {
-    if (!sdkPlayer) {
-      return;
-    }
-    sdkPlayer.connect();
+export default function PlayControl({ player }) {
+  // useEffect(() => {
+  //   if (!player) {
+  //     return;
+  //   }
+  //   player.connect();
 
-    /* 플레이어 상태가 변경될 때마다 */
-    sdkPlayer.addListener('ready', ({ device_id }) => {
-      console.log('The Web Playback SDK is ready to play music!');
-      console.log('Device ID', device_id);
-    })
-  }, [sdkPlayer]);
+  //   /* 플레이어 상태가 변경될 때마다 */
+  //   player.addListener('ready', ({ device_id }) => {
+  //     console.log('The Web Playback SDK is ready to play music!');
+  //     console.log('Device ID', device_id);
+  //   })
+  // }, [player]);
 
   return (
     <Container>
