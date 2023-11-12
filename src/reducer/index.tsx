@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux';
-import Player from "../components/common/Player";
+import SdkReadySlice from "../slices/SdkReady";
 
-const rootReducer = combineReducers({
-  Player
+const Reducer = combineReducers({
+  SdkReady: SdkReadySlice.reducer,
 });
 
-export default rootReducer;
 
-export type RootState = ReturnType<typeof rootReducer>;
+export type RootState = ReturnType<typeof Reducer>;
+export default Reducer;

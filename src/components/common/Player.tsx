@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSelector, useDispatch } from "react-redux"
-import { RootState } from "../../index";
-import { sdkReady } from "../../store/store";
+import { RootState } from "../../reducer/index";
+import { SDKREADY } from "../../slices/SdkReady";
 import styled from 'styled-components';
 import axios from 'axios';
 
@@ -72,7 +72,8 @@ const Container = styled.div`
 `
 
 const Player = (props) => {
-  const isSdkReady =useSelector( (state: RootState) => state.PLAYERSDK.isSdkReady)
+  const isSdkReady =useSelector( (state: RootState) => state.SdkReady.isSdkReady)
+
   const dispatch = useDispatch();
   const [sdkPlayer, setSdkPlayer] = useState(null);
 
@@ -84,7 +85,7 @@ const Player = (props) => {
     document.body.appendChild(script);
 
     window.onSpotifyWebPlaybackSDKReady = () => {
-      dispatch(sdkReady())
+      dispatch(SDKREADY())
     };
   }, []);
 
@@ -105,6 +106,7 @@ const Player = (props) => {
       });
       setSdkPlayer(player);
 
+      console.log('ready')
       /**
        * promise는 state에 담지 말기
        */

@@ -1,4 +1,5 @@
-import { configureStore, createSlice } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
+import Reducer from "../reducer/index";
 
 // /**
 //  * PLAYTRACK
@@ -46,24 +47,7 @@ import { configureStore, createSlice } from '@reduxjs/toolkit'
  * PLAYERSDK
  * - SDK ready
  */
-const PLAYERSDK = createSlice({
-  name: 'PLAYERSDK',
-  initialState: {
-    isSdkReady: false
-  },
-  reducers:{
-    sdkReady (state){
-      state.isSdkReady = true;
-    },
-  }
-});
 
 export default configureStore({
-  reducer: {
-    // PLAYTRACKINFO : PLAYTRACKINFO.reducer,
-    // PLAYCONTROL: PLAYCONTROL.reducer,
-    PLAYERSDK: PLAYERSDK.reducer
-}
-})
-
-export const { sdkReady } = PLAYERSDK.actions;
+  reducer: Reducer,
+});

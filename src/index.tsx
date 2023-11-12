@@ -6,7 +6,7 @@ import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import store from './store/store'
 
-export type RootState = ReturnType<typeof store.getState>
+// export type RootState = ReturnType<typeof store.getState>
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
