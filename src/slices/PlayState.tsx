@@ -17,6 +17,7 @@ const PlayStateSlice = createSlice({
       state.AlbumCover = action.payload.track_window.current_track.album.images[2].url === null? '':action.payload.track_window.current_track.album.images[2].url
       state.TrackName = action.payload.track_window.current_track.name === null? '':action.payload.track_window.current_track.name;
       state.ArtistName = action.payload.track_window.current_track.artists[0].name === null? '':action.payload.track_window.current_track.artists[0].name;
+      // 어떻게 관리할지 고민하기
       state.Duration = {
         min: Math.floor((action.payload.duration / 1000) / 60),
         sec: Math.floor((action.payload.duration / 1000) % 60)
