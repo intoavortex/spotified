@@ -2,6 +2,9 @@ import { useState } from 'react';
 import styled from 'styled-components';
 
 import { MdKeyboardArrowDown } from 'react-icons/md';
+import { useSelector, useDispatch } from "react-redux"
+import { RootState } from "../../../types/Type";
+import { IsCoverToggle } from "../../../slices/PlayState";
 
 interface StyledType {
   isTopActive: boolean
@@ -67,6 +70,7 @@ const LeftCoverBtn = styled.div<StyledType>`
   justify-content: center;
   align-items: center;
   margin-right:5px;
+  transform: rotate(-180deg);
   margin-top:5px;
   border:none;
   border-radius: 50%;
@@ -84,28 +88,27 @@ const LeftCoverBtn = styled.div<StyledType>`
 `
 
 export default function AlbumCover() {
-  const [isCoverToggle, setIsCoverToggle] = useState<any>(false);
-
-  const [albumCover, setAlbumCover] = useState<string>('');
+  const playState = useSelector((state: RootState) => state.playState);
+  const dispatch = useDispatch();
 
   const CoverHandler = () => {
-    isCoverToggle? setIsCoverToggle(false) : setIsCoverToggle(true);
+    playState.isCoverToggle? dispatch(IsCoverToggle(false)) : dispatch(IsCoverToggle(true));
   }
 
   return (
     <>
-      <TopAlbumCover isTopActive={isCoverToggle}>
-        <TopCoverBtn onClick={() => {CoverHandler()}} isTopActive={isCoverToggle}>
+      <TopAlbumCover isTopActive={playState.isCoverToggle}>
+        <TopCoverBtn onClick={() => {CoverHandler()}} isTopActive={playState.isCoverToggle}>
           <MdKeyboardArrowDown size='20'/>
         </TopCoverBtn>
-        <img src={albumCover} alt=''/>
+        <img src={playState.AlbumCover} alt=''/>
       </TopAlbumCover>
 
-      <LeftAlbumCover isTopActive={isCoverToggle}>
-        <LeftCoverBtn onClick={() => {CoverHandler()}} isTopActive={isCoverToggle}>
+      <LeftAlbumCover isTopActive={playState.isCoverToggle}>
+        <LeftCoverBtn onClick={() => {CoverHandler()}} isTopActive={playState.isCoverToggle}>
           <MdKeyboardArrowDown size='20'/>
         </LeftCoverBtn>
-        <img src={albumCover} alt=''/>
+        <img src={playState.AlbumCover} alt=''/>
       </LeftAlbumCover>
 
     </>

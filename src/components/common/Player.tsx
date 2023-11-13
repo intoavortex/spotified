@@ -1,9 +1,13 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useSelector, useDispatch } from "react-redux"
-import { RootState } from "../../types/Type";
-import { SDKREADY } from "../../slices/SdkReady";
 import styled from 'styled-components';
 import axios from 'axios';
+
+import { RootState } from "../../types/Type";
+import { SDKREADY } from "../../slices/SdkReady";
+import { UpdatePlayerState } from "../../slices/PlayState";
+
+import playTrackInfo from "../../js/api/playTrackInfo";
 
 import PlayInfo from '../player/layout/PlayInfo'
 import TrackBar from '../player/layout/TrackBar'
@@ -76,23 +80,6 @@ const Player = (props) => {
   const dispatch = useDispatch();
   const [sdkPlayer, setSdkPlayer] = useState(null);
 
-  const playTrackInfo = useCallback(async (device_id) => {
-    try {
-      const res = await axios.put('https://api.spotify.com/v1/me/player', {
-        device_ids: [device_id],
-        play: false,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${props.token}`,
-        },
-      });
-      return res;
-    } catch (err) {
-      alert(err);
-    }
-  }, []);
-
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://sdk.scdn.co/spotify-player.js';
@@ -115,30 +102,36 @@ const Player = (props) => {
       const player = new window.Spotify.Player({
         name: 'zei Web Player',
         getOAuthToken: cb => { cb(props.token); },
-        volume: 0.2
+        volume: 0.1
       });
 
       setSdkPlayer(player);
 
+      // player ready
       player.addListener('ready', ({ device_id }) => {
-        playTrackInfo(device_id)
+        playTrackInfo(device_id, props.token)
+      });
 
+      // state가 변경될 때
+      player.addListener('player_state_changed', (state) => {
+        if (!state) {
+          return;
+        }
+
+        // 최근 state 가져오기
         player.getCurrentState().then( state => {
           if (!state) {
             console.error('User is not playing music through the Web Playback SDK');
             return;
           }
-
-          console.log('❤️‍🔥 current', state);
-
+          // console.log('❤️‍🔥 current', state);
         });
+        dispatch(UpdatePlayerState(state))
       });
 
-      player.connect().then(success => {
-        if (success) {
-          console.log('The Web Playback SDK successfully connected to Spotify!');
-        }
-      })
+      // player connect
+      player.connect();
+
     } catch (error) {
       console.error('Error initializing player:', error);
     }
@@ -153,7 +146,7 @@ const Player = (props) => {
   return (
     <Container>
       <PlayInfo />
-      <TrackBar />
+      <TrackBar player={sdkPlayer} token={props.token}/>
       <PlayControl/>
     </Container>
   );

@@ -1,5 +1,7 @@
-import { useState } from 'react';
 import styled from 'styled-components';
+
+import { useSelector } from "react-redux"
+import { RootState } from "../../../types/Type";
 
 import LikeButton from "../components/buttons/LikeButton";
 import PIPButton from "../components/buttons/PIPButton";
@@ -14,6 +16,9 @@ const Container = styled.div`
 
 const TitleBox = styled.div`
   transition:all .3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   margin-left: 14px;
   margin-right: 14px;
   text-align: left;
@@ -57,22 +62,15 @@ const LikeBtn = styled.button`
 
 
 export default function PlayInfo() {
-  const [isCoverToggle, setIsCoverToggle] = useState<any>(false);
-
-  const [trackName, setTrackName] = useState<string>('');
-  const [artistName, setArtistName] = useState<string>('');
-
-  const CoverHandler = () => {
-    isCoverToggle? setIsCoverToggle(false) : setIsCoverToggle(true);
-  }
+  const playState = useSelector((state: RootState) => state.playState);
 
   return (
     <Container>
       <AlbumCover />
 
       <TitleBox>
-        <Title>{trackName}</Title>
-        <Artist>{artistName}</Artist>
+        <Title>{playState.TrackName}</Title>
+        <Artist>{playState.ArtistName}</Artist>
       </TitleBox>
 
       <BtnBox>

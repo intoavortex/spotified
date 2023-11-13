@@ -1,7 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useSelector, useDispatch } from "react-redux"
+import { RootState } from "../../../types/Type";
 
-import BarComponent from "../components/Bars/VolumeBar";
+import playTrackInfo from "../../../js/api/playTrackInfo";
+import { TimeText } from "../../../slices/PlayState";
+
+import PlayBar from "../components/Bars/PlayBar";
 import ShuffleButton from "../components/buttons/ShuffleButton";
 import BackwardButton from "../components/buttons/BackwardButton";
 import FowardButton from "../components/buttons/FowardButton";
@@ -33,11 +38,34 @@ const PlayTime = styled.span`
 
 
 
-export default function TrackBar() {
-  // 트랙 시간(텍스트)
-  const [duration, setDuration] = useState<{min:number, sec:number}>({min:0, sec:0});
-  // 현재 트랙 시간(텍스트)
-  const [playTime, setPlayTime] = useState<{min:number, sec:number}>({min:0, sec:0});
+export default function TrackBar({ player, token }) {
+  const dispatch = useDispatch();
+  const isPause = useSelector((state: RootState) => state.playState.IsPause);
+  const duration = useSelector((state: RootState) => state.playState.Duration);
+  const nowPlayPosition = useSelector((state: RootState) => state.playState.NowPlayPosition);
+
+  useEffect(() => {
+    if (!player) return;
+
+    function playTimeText() {
+      console.log(player);
+
+      player.getCurrentState().then(state => {
+        dispatch(TimeText(state));
+      })
+    }
+
+    let interval;
+    if(!isPause){
+      interval = setInterval(playTimeText, 700);
+      return () => {
+          clearInterval(interval);
+      }
+    }else if(isPause){
+      clearInterval(interval)
+    }
+    return () => clearInterval(interval);
+  }, [isPause])
 
   return (
     <div>
@@ -47,7 +75,7 @@ export default function TrackBar() {
         {/* 이전 트랙 재생 */}
         <BackwardButton />
         {/* 재생 일시정지 */}
-        <PlayButton />
+        <PlayButton player={player}/>
         {/* 다음 트랙 재생 */}
         <FowardButton />
         {/* 반복 */}
@@ -56,8 +84,8 @@ export default function TrackBar() {
 
       <PlayerBar>
         {/* '그' 녀석 */}
-        <PlayTime>{playTime.min}:{playTime.sec < 10? '0' + playTime.sec : playTime.sec}</PlayTime>
-        <BarComponent />
+        <PlayTime>{nowPlayPosition.min}:{nowPlayPosition.sec < 10? '0' + nowPlayPosition.sec : nowPlayPosition.sec}</PlayTime>
+        <PlayBar />
         <PlayTime>{duration.min}:{duration.sec < 10? '0' + duration.sec : duration.sec}</PlayTime>
       </PlayerBar>
     </div>

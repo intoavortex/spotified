@@ -6,25 +6,49 @@ const PlayStateSlice = createSlice({
     AlbumCover: '',
     TrackName: '',
     ArtistName: '',
-    Duration: 0,
-    // PlayTime: 0,
-    // IsSeeking: 0,
+    Duration: {min:0, sec:0},
+    NowPlayPosition: {min:0, sec:0},
+    isCoverToggle: false,
     IsPlay: false,
     IsPause: true,
-    // Shuffles: false,
-    // Repeats: '',
   },
   reducers:{
-    UpdatePlayerState (state, action){
+    UpdatePlayerState(state, action){
       state.AlbumCover = action.payload.track_window.current_track.album.images[2].url === null? '':action.payload.track_window.current_track.album.images[2].url
       state.TrackName = action.payload.track_window.current_track.name === null? '':action.payload.track_window.current_track.name;
       state.ArtistName = action.payload.track_window.current_track.artists[0].name === null? '':action.payload.track_window.current_track.artists[0].name;
-      state.Duration = action.payload.duration;
-      // state.IsPause === true? setIsPlay(false) : setIsPlay(true);
+      state.Duration = {
+        min: Math.floor((action.payload.duration / 1000) / 60),
+        sec: Math.floor((action.payload.duration / 1000) % 60)
+      }
+      state.NowPlayPosition = {
+        min: Math.floor((action.payload.position / 1000) / 60),
+        sec: Math.floor((action.payload.position / 1000) % 60)
+      }
     },
+
+    IsCoverToggle(state, action){
+      state.isCoverToggle = action.payload
+    },
+
+    PlayTrackState(state, action){
+      state.Duration = action.payload.duration;
+      state.NowPlayPosition = action.payload.position;
+    },
+
+    PlayTrack(state, action){
+      state.IsPause = action.payload
+    },
+
+    TimeText(state, action){
+      state.NowPlayPosition = {
+        min: Math.floor((action.payload.position / 1000) / 60),
+        sec: Math.floor((action.payload.position / 1000) % 60)
+      }
+    }
   }
 });
 
-export const { UpdatePlayerState } = PlayStateSlice.actions;
+export const { UpdatePlayerState, IsCoverToggle, PlayTrack, TimeText } = PlayStateSlice.actions;
 
 export default PlayStateSlice;

@@ -14,7 +14,7 @@
 
 - - -
 
-Spotify 웹 플레이어 
+Spotify 웹 플레이어 💭
 
 <!-- # Getting Started with Create React App
 
