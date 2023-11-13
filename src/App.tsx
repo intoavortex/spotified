@@ -3,12 +3,14 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 
 import './App.css';
+// import Player from './components/common/Player_';
 import Player from './components/common/Player';
 import SideList from './components/common/SideList';
 import Container from './container/common/Container'
 
 import styled from 'styled-components';
 import { Reset } from 'styled-reset'
+import axios from 'axios';
 
 const Wrap = styled.div`
   display:flex;
@@ -25,9 +27,8 @@ function App() {
   useEffect(() => {
 
     async function getToken() {
-      const response = await fetch('http://localhost:8888/access-token');
-      const json = await response.json();
-      setToken(json.access_token);
+      const res = await axios('http://localhost:8888/access-token');
+      setToken(res.data.access_token);
     }
 
     getToken();

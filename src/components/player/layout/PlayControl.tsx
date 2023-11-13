@@ -1,6 +1,9 @@
 import styled from 'styled-components';
 import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
+import { useSelector, useDispatch } from "react-redux"
+import { RootState } from "../../../types/Type";
+import { UpdatePlayerState } from "../../../slices/PlayState";
 
 import LyricsButton from "../components/buttons/LyricsButton";
 import PlayListButton from "../components/buttons/PlayListButton";
@@ -9,31 +12,14 @@ import VolumeButton from "../components/buttons/VolumeButton";
 import FullScreenButton from "../components/buttons/FullScreenButton";
 import BarComponent from "../components/Bars/VolumeBar";
 
+// import * as PlayTrackInfo from "../../../js/api/PlayTrackInfo";
+
 const Container = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: right;
   align-items: center;
-`
-
-const Barbox = styled.div`
-  width:100%;
-  max-width:608px;
-  height:4px;
-  background-color:hsla(0,0%,100%,.3);
-  border-radius: 2px;
-  overflow:hidden;
-`
-
-const VolumeBar = styled.a`
-  display:block;
-  width:  40%;
-  // isPlayBar
-  height:100%;
-  border-radius: 2px;
-  background-color: #fff;
-  /* transform:translateX(-100%); */
 `
 
 const VolumeBox = styled.div`
@@ -46,18 +32,56 @@ const VolumeBox = styled.div`
   margin-right:4px;
 `
 
-export default function PlayControl({ player }) {
+// export default function PlayControl({ player, token }) {
+export default function PlayControl() {
+  // const playTrackInfo = useCallback(async (device_id) => {
+  //   try {
+  //     const res = await axios.put('https://api.spotify.com/v1/me/player', {
+  //       device_ids: [device_id],
+  //       play: false,
+  //     },
+  //     {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     return res;
+  //   } catch (err) {
+  //     alert(err);
+  //   }
+  // }, []);
+
+  // const dispatch = useDispatch();
+
   // useEffect(() => {
   //   if (!player) {
   //     return;
   //   }
-  //   player.connect();
 
-  //   /* 플레이어 상태가 변경될 때마다 */
-  //   player.addListener('ready', ({ device_id }) => {
-  //     console.log('The Web Playback SDK is ready to play music!');
-  //     console.log('Device ID', device_id);
-  //   })
+    // console.log(player);
+
+    /* 플레이어 상태가 변경될 때마다 */
+    // player.addListener('ready', ({ device_id }) => {
+    //   playTrackInfo(device_id)
+
+    //   player.getCurrentState().then( state => {
+    //     if (!state) {
+    //       console.error('User is not playing music through the Web Playback SDK');
+    //       return;
+    //     }
+
+    //     console.log('❤️‍🔥 current', state);
+
+    //   });
+
+    // })
+
+    // player.addListener('player_state_changed', (state) => {
+    //   if (!state) {
+    //     return;
+    //   }
+    //   dispatch(UpdatePlayerState(state))
+    // });
   // }, [player]);
 
   return (
