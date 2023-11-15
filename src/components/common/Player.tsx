@@ -102,7 +102,7 @@ const Player = (props) => {
       const player = new window.Spotify.Player({
         name: 'zei Web Player',
         getOAuthToken: cb => { cb(props.token); },
-        volume: 0.1
+        volume: 1
       });
 
       setSdkPlayer(player);
@@ -117,15 +117,14 @@ const Player = (props) => {
         if (!state) {
           return;
         }
-
         // 최근 state 가져오기
-        player.getCurrentState().then( state => {
-          if (!state) {
-            console.error('User is not playing music through the Web Playback SDK');
-            return;
-          }
-          // console.log('❤️‍🔥 current', state);
-        });
+        // player.getCurrentState().then( state => {
+        //   if (!state) {
+        //     console.error('User is not playing music through the Web Playback SDK');
+        //     return;
+        //   }
+        //   console.log('❤️‍🔥 current', state);
+        // });
         dispatch(UpdatePlayerState(state))
       });
 

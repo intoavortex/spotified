@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux"
 import { RootState } from "../../../types/Type";
 
 import playTrackInfo from "../../../js/api/playTrackInfo";
-import { TimeText } from "../../../slices/PlayState";
+import { NowPlayChange } from "../../../slices/PlayState";
 
 import PlayBar from "../components/Bars/PlayBar";
 import ShuffleButton from "../components/buttons/ShuffleButton";
@@ -44,14 +44,28 @@ export default function TrackBar({ player, token }) {
   const duration = useSelector((state: RootState) => state.playState.Duration);
   const nowPlayPosition = useSelector((state: RootState) => state.playState.NowPlayPosition);
 
+  const [durationText, setDurationText] = useState({min:0, sec:0})
+  const [nowPlayPositionText, setNowPlayPositionText] = useState({min:0, sec:0})
+
+  useEffect(() => {
+    setDurationText({
+      min: Math.floor((duration / 1000) / 60),
+      sec: Math.floor((duration / 1000) % 60)
+    })
+
+    setNowPlayPositionText({
+      min: Math.floor((nowPlayPosition / 1000) / 60),
+      sec: Math.floor((nowPlayPosition / 1000) % 60)
+    })
+  }, [duration, nowPlayPosition])
+
   useEffect(() => {
     if (!player) return;
 
     function playTimeText() {
-      console.log(player);
 
       player.getCurrentState().then(state => {
-        dispatch(TimeText(state));
+        dispatch(NowPlayChange(state));
       })
     }
 
@@ -65,7 +79,7 @@ export default function TrackBar({ player, token }) {
       clearInterval(interval)
     }
     return () => clearInterval(interval);
-  }, [isPause])
+  }, [isPause, nowPlayPosition, NowPlayChange])
 
   return (
     <div>
@@ -84,9 +98,11 @@ export default function TrackBar({ player, token }) {
 
       <PlayerBar>
         {/* '그' 녀석 */}
-        <PlayTime>{nowPlayPosition.min}:{nowPlayPosition.sec < 10? '0' + nowPlayPosition.sec : nowPlayPosition.sec}</PlayTime>
-        <PlayBar />
-        <PlayTime>{duration.min}:{duration.sec < 10? '0' + duration.sec : duration.sec}</PlayTime>
+        {/* <PlayTime>{nowPlayPosition}</PlayTime> */}
+        <PlayTime>{nowPlayPositionText.min}:{nowPlayPositionText.sec < 10? '0' + nowPlayPositionText.sec : nowPlayPositionText.sec}</PlayTime>
+        <PlayBar player={player}/>
+        {/* <PlayTime>{duration}</PlayTime> */}
+        <PlayTime>{durationText.min}:{durationText.sec < 10? '0' + durationText.sec : durationText.sec}</PlayTime>
       </PlayerBar>
     </div>
   );

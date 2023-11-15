@@ -69,17 +69,18 @@ const PlayBar = styled.input`
   }
 `
 interface Iprops {
+  id?: string,
   minValue: number,
   maxValue: number,
   defaultValue: number,
   onMouseUp: React.MouseEventHandler
 }
 
-export default function Bar({minValue , maxValue, onMouseUp, defaultValue}:Iprops) {
+export default function Bar({id, minValue , maxValue, onMouseUp, defaultValue}:Iprops) {
 
   return (
     <BarOverBox className='playerBarBox' id='playerBarBox'>
-      <PlayBar type="range" id="playBarRange" min={minValue} max={maxValue} defaultValue={defaultValue} onMouseUp={onMouseUp}/>
+      <PlayBar id={id} type="range" min={minValue} max={maxValue} defaultValue={defaultValue} onMouseUp={onMouseUp}/>
     </BarOverBox>
   );
 }

@@ -6,8 +6,9 @@ const PlayStateSlice = createSlice({
     AlbumCover: '',
     TrackName: '',
     ArtistName: '',
-    Duration: {min:0, sec:0},
-    NowPlayPosition: {min:0, sec:0},
+    Duration: 0,
+    NowPlayPosition: 0,
+    SeekPosition: 0,
     isCoverToggle: false,
     IsPlay: false,
     IsPause: true,
@@ -18,14 +19,8 @@ const PlayStateSlice = createSlice({
       state.TrackName = action.payload.track_window.current_track.name === null? '':action.payload.track_window.current_track.name;
       state.ArtistName = action.payload.track_window.current_track.artists[0].name === null? '':action.payload.track_window.current_track.artists[0].name;
       // 어떻게 관리할지 고민하기
-      state.Duration = {
-        min: Math.floor((action.payload.duration / 1000) / 60),
-        sec: Math.floor((action.payload.duration / 1000) % 60)
-      }
-      state.NowPlayPosition = {
-        min: Math.floor((action.payload.position / 1000) / 60),
-        sec: Math.floor((action.payload.position / 1000) % 60)
-      }
+      state.Duration = action.payload.duration
+      state.NowPlayPosition = action.payload.position
     },
 
     IsCoverToggle(state, action){
@@ -38,18 +33,16 @@ const PlayStateSlice = createSlice({
     },
 
     PlayTrack(state, action){
-      state.IsPause = action.payload
+      state.IsPause = action.payload;
     },
 
-    TimeText(state, action){
-      state.NowPlayPosition = {
-        min: Math.floor((action.payload.position / 1000) / 60),
-        sec: Math.floor((action.payload.position / 1000) % 60)
-      }
-    }
+    NowPlayChange(state, action){
+      state.NowPlayPosition = action.payload.position;
+    },
+
   }
 });
 
-export const { UpdatePlayerState, IsCoverToggle, PlayTrack, TimeText } = PlayStateSlice.actions;
+export const { UpdatePlayerState, IsCoverToggle, PlayTrack, NowPlayChange } = PlayStateSlice.actions;
 
 export default PlayStateSlice;
