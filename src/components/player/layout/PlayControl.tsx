@@ -10,7 +10,7 @@ import PlayListButton from "../components/buttons/PlayListButton";
 import DeviceConnectButton from "../components/buttons/DeviceConnectButton";
 import VolumeButton from "../components/buttons/VolumeButton";
 import FullScreenButton from "../components/buttons/FullScreenButton";
-import BarComponent from "../components/Bars/VolumeBar";
+import VolumeBar from "../components/Bars/VolumeBar";
 
 // import * as PlayTrackInfo from "../../../js/api/PlayTrackInfo";
 
@@ -32,57 +32,31 @@ const VolumeBox = styled.div`
   margin-right:4px;
 `
 
-// export default function PlayControl({ player, token }) {
-export default function PlayControl() {
-  // const playTrackInfo = useCallback(async (device_id) => {
-  //   try {
-  //     const res = await axios.put('https://api.spotify.com/v1/me/player', {
-  //       device_ids: [device_id],
-  //       play: false,
-  //     },
-  //     {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     });
-  //     return res;
-  //   } catch (err) {
-  //     alert(err);
-  //   }
-  // }, []);
+export default function PlayControl({ player }) {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!player) {
+      return;
+    }
 
-  // const dispatch = useDispatch();
-
-  // useEffect(() => {
-  //   if (!player) {
-  //     return;
-  //   }
-
-    // console.log(player);
 
     /* 플레이어 상태가 변경될 때마다 */
-    // player.addListener('ready', ({ device_id }) => {
-    //   playTrackInfo(device_id)
-
-    //   player.getCurrentState().then( state => {
-    //     if (!state) {
-    //       console.error('User is not playing music through the Web Playback SDK');
-    //       return;
-    //     }
-
-    //     console.log('❤️‍🔥 current', state);
-
-    //   });
-
-    // })
-
     // player.addListener('player_state_changed', (state) => {
-    //   if (!state) {
-    //     return;
-    //   }
-    //   dispatch(UpdatePlayerState(state))
-    // });
-  // }, [player]);
+      //   if (!state) {
+        //     return;
+        //   }
+        //   dispatch(UpdatePlayerState(state))
+        // });
+  }, []);
+  const [changeVolumeData, setChangeVolumeData] = useState('');
+  const [clickVolumeData, setClickVolumeData] = useState('');
+  const onVolumeChange = (volumeChangeData) => {
+    setChangeVolumeData(volumeChangeData)
+  }
+
+  const onClickVolumeChange = (clickVolumeData) => {
+    setClickVolumeData(clickVolumeData)
+  }
 
   return (
     <Container>
@@ -91,8 +65,8 @@ export default function PlayControl() {
       <DeviceConnectButton />
 
       <VolumeBox className='playerBarBox'>
-        <VolumeButton />
-        <BarComponent/>
+        <VolumeButton player={ player } volumeData={changeVolumeData} onClickVolumeChange={onClickVolumeChange}/>
+        <VolumeBar player={ player } onVolumeChange={onVolumeChange} clickVolumeData={clickVolumeData}/>
       </VolumeBox>
       <FullScreenButton />
     </Container>

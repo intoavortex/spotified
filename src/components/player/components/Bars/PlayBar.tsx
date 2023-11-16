@@ -12,32 +12,39 @@ export default function PlayBar({ player }) {
   const duration = useSelector((state: RootState) => state.playState.Duration);
   const nowPlayPosition = useSelector((state: RootState) => state.playState.NowPlayPosition);
 
+  useEffect(() => {
+
+    function playTimeText() {
+
+      player.getCurrentState().then(state => {
+        dispatch(NowPlayChange(state));
+      })
+
+      const playBarValue = document.getElementById('playBarRange') as HTMLInputElement
+      playBarValue.value = String(nowPlayPosition)
+    }
+
+    let interval;
+    if(!isPause){
+      interval = setInterval(playTimeText, 700);
+      return () => {
+          clearInterval(interval);
+      }
+    }else if(isPause){
+      clearInterval(interval)
+    }
+    return () => clearInterval(interval);
+  }, [nowPlayPosition])
+
+
   const durationSeekHandler = (e) => {
     e.preventDefault();
-    player.seek(parseInt(e.target.value)).then(() => {
-      function playTimeText() {
-
-        player.getCurrentState().then(state => {
-          dispatch(NowPlayChange(state));
-        })
-      }
-
-      let interval;
-      if(!isPause){
-        interval = setInterval(playTimeText, 700);
-        return () => {
-            clearInterval(interval);
-        }
-      }else if(isPause){
-        clearInterval(interval)
-      }
-      return () => clearInterval(interval);
-    });
+    player.seek(parseInt(e.target.value));
   }
 
   return (
     <>
-      <Bar minValue={0} maxValue={duration} onMouseUp={(e) => { durationSeekHandler(e)}} defaultValue={nowPlayPosition}/>
+      <Bar id="playBarRange" minValue={0} maxValue={duration} onMouseUp={(e) => { durationSeekHandler(e) }} defaultValue={nowPlayPosition} />
     </>
   );
 }

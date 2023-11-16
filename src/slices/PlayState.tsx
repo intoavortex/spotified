@@ -8,10 +8,11 @@ const PlayStateSlice = createSlice({
     ArtistName: '',
     Duration: 0,
     NowPlayPosition: 0,
-    SeekPosition: 0,
+    VolumeRange: 100,
     isCoverToggle: false,
     IsPlay: false,
     IsPause: true,
+    volumeBtn: '',
   },
   reducers:{
     UpdatePlayerState(state, action){
@@ -40,9 +41,34 @@ const PlayStateSlice = createSlice({
       state.NowPlayPosition = action.payload.position;
     },
 
+    setVolume(state, action){
+      state.VolumeRange = action.payload
+    },
+
+    volumeControl(state, action){
+
+      if(action.payload < 1){
+        state.VolumeRange = 100
+      }
+      // if(action.payload > 1 && action.payload <= 50 ){
+      //   state.VolumeRange = 100
+      // }
+      if(action.payload > 1 && action.payload <= 100){
+        state.VolumeRange = 0
+      }
+
+    }
+
   }
 });
 
-export const { UpdatePlayerState, IsCoverToggle, PlayTrack, NowPlayChange } = PlayStateSlice.actions;
+export const {
+  UpdatePlayerState,
+  IsCoverToggle,
+  PlayTrack,
+  NowPlayChange,
+  setVolume,
+  volumeControl
+} = PlayStateSlice.actions;
 
 export default PlayStateSlice;

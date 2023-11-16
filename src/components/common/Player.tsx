@@ -100,7 +100,7 @@ const Player = (props) => {
       }
 
       const player = new window.Spotify.Player({
-        name: 'zei Web Player',
+        name: 'ᴢᴇɪ ꜱᴘᴏᴛɪғʏ ᴡᴇʙ ᴘʟᴀʏᴇʀ',
         getOAuthToken: cb => { cb(props.token); },
         volume: 1
       });
@@ -146,7 +146,7 @@ const Player = (props) => {
     <Container>
       <PlayInfo />
       <TrackBar player={sdkPlayer} token={props.token}/>
-      <PlayControl/>
+      <PlayControl player={sdkPlayer}/>
     </Container>
   );
 }

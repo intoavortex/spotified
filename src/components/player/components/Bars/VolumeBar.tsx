@@ -1,13 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Bar from "./common/Bar";
 
-export default function VolumeBar() {
-  const [testState, setTestState] = useState(1324);
+import { useSelector, useDispatch } from "react-redux"
+import { RootState } from "../../../../types/Type";
+
+import { volumeControl, setVolume } from "../../../../slices/PlayState";
+import { click } from "@testing-library/user-event/dist/click";
+
+export default function VolumeBar({ player, onVolumeChange, clickVolumeData }) {
+  const dispatch = useDispatch();
+  const VolumeRange = useSelector((state: RootState) => state.playState.VolumeRange);
+
+  useEffect(() => {
+    if (!player) {
+      return;
+    }
+    player.setVolume(VolumeRange / 100);
+  }, [VolumeRange])
+
+  useEffect(() => {
+    if (!clickVolumeData) {
+      return;
+    }
+    player.setVolume(parseInt(clickVolumeData) / 100);
+
+    const volumeBarValue = document.getElementById('volumeBarRange') as HTMLInputElement
+    volumeBarValue.value = String(VolumeRange)
+  }, [clickVolumeData])
+
+  const volumeHandler = (e) => {
+    e.preventDefault();
+    player.setVolume(e.target.value / 100);
+    dispatch(volumeControl(e.target.value))
+    const volumeChangeData = e.target.value;
+    onVolumeChange(volumeChangeData)
+  }
 
   return (
     <>
-      <Bar minValue={testState} maxValue={testState} onMouseUp={() => { console.log('PlayBar');
-       }} defaultValue={testState}/>
+      <Bar id="volumeBarRange" minValue={0} maxValue={100} onMouseUp={(e) => { volumeHandler(e)
+       }} defaultValue={VolumeRange}/>
     </>
   );
 }

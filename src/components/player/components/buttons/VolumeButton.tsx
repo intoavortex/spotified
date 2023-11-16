@@ -1,22 +1,37 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from "react-redux"
+import { RootState } from "../../../../types/Type";
+
+import { volumeControl, setVolume } from "../../../../slices/PlayState";
 
 import { BsFillVolumeDownFill, BsFillVolumeOffFill, BsFillVolumeUpFill } from 'react-icons/bs';
 import Button from "./common/Button";
 
-export default function VolumeButton() {
+export default function VolumeButton({ player, volumeData, onClickVolumeChange }) {
+  const dispatch = useDispatch();
+  const VolumeRange = useSelector((state: RootState) => state.playState.VolumeRange);
 
-  const [volume, setVolume] = useState('max')
+
+  useEffect(() => {
+    if(!volumeData) return;
+    dispatch(setVolume(volumeData))
+  }, [volumeData])
+
+  const volumehandler = (e) => {
+    console.log(VolumeRange);
+
+    player.setVolume(VolumeRange / 100);
+    dispatch(volumeControl(VolumeRange));
+    onClickVolumeChange(String(VolumeRange))
+    console.log('test');
+  }
 
   return (
     <>
-      <Button title='볼륨' onClick={() => {
-          if(volume === 'muted'){setVolume('slince')}
-          if(volume === 'slince'){setVolume('max')}
-          if(volume === 'max'){setVolume('muted')}
-        }}>
-        {volume === 'max' && <BsFillVolumeUpFill size='20' className={'svgIcon'}/>}
-        {volume === 'slince' && <BsFillVolumeDownFill size='20' className={'svgIcon'}/>}
-        {volume === 'muted' && <BsFillVolumeOffFill size='20' className={'svgIcon'}/>}
+      <Button title='볼륨' onClick={(e) => { volumehandler(e) }}>
+        {VolumeRange > 51 && VolumeRange <= 100 && <BsFillVolumeUpFill size='20' className={'svgIcon'}/>}
+        {VolumeRange > 1 && VolumeRange <= 50 && <BsFillVolumeDownFill size='20' className={'svgIcon'}/>}
+        {VolumeRange < 1 && <BsFillVolumeOffFill size='20' className={'svgIcon'}/>}
       </Button>
     </>
   );

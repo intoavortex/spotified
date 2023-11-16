@@ -122,12 +122,12 @@ function ContainerHeader() {
     <Container>
       <FlexContainer>
         <HistoryBtnBox>
-          <Btn href={'#none'} title="뒤로 가기">
+          {/* <Btn href={'#none'} title="뒤로 가기">
             <SlArrowLeft color='white'/>
           </Btn>
           <Btn href={'#none'} title="앞으로 가기">
             <SlArrowRight color='white'/>
-          </Btn>
+          </Btn> */}
         </HistoryBtnBox>
         <UserBtn onClick={() => userInfo === false? setUserInfo(true) : setUserInfo(false)}>
           <UserIcon><BiUser size='18' color='white'/></UserIcon>
@@ -145,15 +145,16 @@ function ContainerHeader() {
               <span>로그인</span>
               <RxExternalLink size='17'/>
             </Link>
-            <Link href='http://localhost:8888/access-token' target='_blank' title='프로필'>
-              {/* <span>프로필</span> */}
-              <span>토큰 발급</span>
-            </Link>
-            <Link href='' title='설정'>
+            {/* <Link href='http://localhost:8888/access-token' target='_blank' title='프로필'>
+              <span>프로필</span>
+            </Link> */}
+            {/* <Link href='' title='설정'>
               <span>설정</span>
-            </Link>
+            </Link> */}
           </BtnGroup>
-          <Link href='' title='로그아웃'>로그아웃</Link>
+          <Link href='http://localhost:8888/access-token' target='_blank' title='프로필'>
+              <span>토큰 발급</span>
+          </Link>
         </MoreInfo>
       }
     </Container>
