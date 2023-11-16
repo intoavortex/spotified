@@ -16,6 +16,20 @@
 
 Spotify 웹 플레이어 💭
 
+**[ Update Note 1.0 ]**
+- PlayInfo
+  - 완료: trackName, artistName, albumCover
+  - 작업 중:
+  - 작업 예정: PIP
+- TrackBar
+  - 완료: play bar
+  - 작업 중: 
+  - 작업 예정: shuffle
+- PlayControl
+  - 완료: volume bar
+  - 작업 중: volume button
+  - 작업 예정: device Connect
+
 <!-- # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
