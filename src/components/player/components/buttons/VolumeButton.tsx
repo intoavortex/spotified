@@ -23,14 +23,13 @@ export default function VolumeButton({ player, volumeData, onClickVolumeChange }
     player.setVolume(VolumeRange / 100);
     dispatch(volumeControl(VolumeRange));
     onClickVolumeChange(String(VolumeRange))
-    console.log('test');
   }
 
   return (
     <>
       <Button title='볼륨' onClick={(e) => { volumehandler(e) }}>
-        {VolumeRange > 51 && VolumeRange <= 100 && <BsFillVolumeUpFill size='20' className={'svgIcon'}/>}
-        {VolumeRange > 1 && VolumeRange <= 50 && <BsFillVolumeDownFill size='20' className={'svgIcon'}/>}
+        {VolumeRange > 61 && VolumeRange <= 100 && <BsFillVolumeUpFill size='20' className={'svgIcon'}/>}
+        {VolumeRange > 1 && VolumeRange <= 60 && <BsFillVolumeDownFill size='20' className={'svgIcon'}/>}
         {VolumeRange < 1 && <BsFillVolumeOffFill size='20' className={'svgIcon'}/>}
       </Button>
     </>

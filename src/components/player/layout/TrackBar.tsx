@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useSelector, useDispatch } from "react-redux"
 import { RootState } from "../../../types/Type";
 
-import playTrackInfo from "../../../js/api/playTrackInfo";
+import playTrackInfo from "../../../js/api/PlayTrackInfo";
 import { NowPlayChange } from "../../../slices/PlayState";
 
 import PlayBar from "../components/Bars/PlayBar";

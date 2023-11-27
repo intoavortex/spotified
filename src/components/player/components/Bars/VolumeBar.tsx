@@ -12,16 +12,12 @@ export default function VolumeBar({ player, onVolumeChange, clickVolumeData }) {
   const VolumeRange = useSelector((state: RootState) => state.playState.VolumeRange);
 
   useEffect(() => {
-    if (!player) {
-      return;
-    }
+    if (!player) return;
     player.setVolume(VolumeRange / 100);
   }, [VolumeRange])
 
   useEffect(() => {
-    if (!clickVolumeData) {
-      return;
-    }
+    if (!clickVolumeData) return;
     player.setVolume(parseInt(clickVolumeData) / 100);
 
     const volumeBarValue = document.getElementById('volumeBarRange') as HTMLInputElement

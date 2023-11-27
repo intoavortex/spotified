@@ -8,7 +8,7 @@ const PlayStateSlice = createSlice({
     ArtistName: '',
     Duration: 0,
     NowPlayPosition: 0,
-    VolumeRange: 100,
+    VolumeRange: 0,
     isCoverToggle: false,
     IsPlay: false,
     IsPause: true,
@@ -42,7 +42,10 @@ const PlayStateSlice = createSlice({
     },
 
     setVolume(state, action){
+
       state.VolumeRange = action.payload
+      console.log(action.payload);
+      console.log(state.VolumeRange);
     },
 
     volumeControl(state, action){

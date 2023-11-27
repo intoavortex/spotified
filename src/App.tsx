@@ -24,16 +24,17 @@ const Wrap = styled.div`
 function App() {
   const [token, setToken] = useState('');
 
+  async function getToken() {
+    const res = await axios.get('http://localhost:8888/access-token');
+    setToken(res.data.access_token);
+  }
+
   useEffect(() => {
-
-    async function getToken() {
-      const res = await axios('http://localhost:8888/access-token');
-      setToken(res.data.access_token);
-    }
-
     getToken();
+    if (!token) return console.log('토큰 없음');
+    console.log('token success: ', token);
 
-  }, []);
+  }, [token]);
 
   return (
     <>

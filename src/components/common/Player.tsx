@@ -6,8 +6,10 @@ import axios from 'axios';
 import { RootState } from "../../types/Type";
 import { SDKREADY } from "../../slices/SdkReady";
 import { UpdatePlayerState } from "../../slices/PlayState";
+import { setVolume } from "../../slices/PlayState";
 
-import playTrackInfo from "../../js/api/playTrackInfo";
+import playTrackInfo from "../../js/api/PlayTrackInfo";
+
 
 import PlayInfo from '../player/layout/PlayInfo'
 import TrackBar from '../player/layout/TrackBar'
@@ -81,6 +83,8 @@ const Player = (props) => {
   const [sdkPlayer, setSdkPlayer] = useState(null);
 
   useEffect(() => {
+    if(!props.token) return console.log('token undefined');
+
     const script = document.createElement('script');
     script.src = 'https://sdk.scdn.co/spotify-player.js';
     script.async = true;
@@ -90,7 +94,7 @@ const Player = (props) => {
     window.onSpotifyWebPlaybackSDKReady = () => {
       dispatch(SDKREADY(true));
     };
-  }, []);
+  }, [props.token]);
 
   const initPlayer = async () => {
     try {
@@ -106,6 +110,14 @@ const Player = (props) => {
       });
 
       setSdkPlayer(player);
+
+      console.log(player);
+
+      player.connect().then(success => {
+        if (success) {
+          console.log('The Web Playback SDK successfully connected to Spotify!');
+        }
+      }).catch((error) => {console.log(error)});
 
       // player ready
       player.addListener('ready', ({ device_id }) => {
@@ -125,11 +137,18 @@ const Player = (props) => {
         //   }
         //   console.log('❤️‍🔥 current', state);
         // });
-        dispatch(UpdatePlayerState(state))
+        // dispatch(UpdatePlayerState(state))
+
+        player.getVolume().then(volume => {
+          let volume_percentage = volume * 100;
+          console.log(`The volume of the player is ${volume_percentage}%`);
+          dispatch(setVolume(volume_percentage))
+        });
+
       });
 
       // player connect
-      player.connect();
+      // player.connect();
 
     } catch (error) {
       console.error('Error initializing player:', error);
