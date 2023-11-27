@@ -35,7 +35,7 @@ export default function VolumeBar({ player, onVolumeChange, clickVolumeData }) {
   return (
     <>
       <Bar id="volumeBarRange" minValue={0} maxValue={100} onMouseUp={(e) => { volumeHandler(e)
-       }} defaultValue={VolumeRange}/>
+       }} defaultValue={100}/>
     </>
   );
 }

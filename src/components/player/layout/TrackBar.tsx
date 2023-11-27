@@ -85,13 +85,13 @@ export default function TrackBar({ player, token }) {
     <div>
       <BtnBox>
         {/* 무작위 재생 */}
-        <ShuffleButton />
+        <ShuffleButton/>
         {/* 이전 트랙 재생 */}
-        <BackwardButton />
+        <BackwardButton player={player}/>
         {/* 재생 일시정지 */}
         <PlayButton player={player}/>
         {/* 다음 트랙 재생 */}
-        <FowardButton />
+        <FowardButton player={player}/>
         {/* 반복 */}
         <RepeatButton />
       </BtnBox>

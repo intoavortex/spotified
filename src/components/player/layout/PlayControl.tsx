@@ -62,7 +62,7 @@ export default function PlayControl({ player }) {
     <Container>
       <LyricsButton />
       <PlayListButton />
-      <DeviceConnectButton />
+      {/* <DeviceConnectButton /> */}
 
       <VolumeBox className='playerBarBox'>
         <VolumeButton player={ player } volumeData={changeVolumeData} onClickVolumeChange={onClickVolumeChange}/>

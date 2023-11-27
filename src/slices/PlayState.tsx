@@ -12,9 +12,20 @@ const PlayStateSlice = createSlice({
     isCoverToggle: false,
     IsPlay: false,
     IsPause: true,
+    IsShuffle: false,
     volumeBtn: '',
+    deviceId: '',
+    PlayerToken: '',
   },
   reducers:{
+    getUserToken(state, action){
+      state.PlayerToken = action.payload
+    },
+
+    getDeviceId(state, action){
+      state.deviceId = action.payload
+    },
+
     UpdatePlayerState(state, action){
       state.AlbumCover = action.payload.track_window.current_track.album.images[2].url === null? '':action.payload.track_window.current_track.album.images[2].url
       state.TrackName = action.payload.track_window.current_track.name === null? '':action.payload.track_window.current_track.name;
@@ -37,6 +48,10 @@ const PlayStateSlice = createSlice({
       state.IsPause = action.payload;
     },
 
+    ShuffleTrack(state, action){
+      state.IsShuffle = action.payload;
+    },
+
     NowPlayChange(state, action){
       state.NowPlayPosition = action.payload.position;
     },
@@ -50,15 +65,15 @@ const PlayStateSlice = createSlice({
 
     volumeControl(state, action){
 
-      if(action.payload < 1){
-        state.VolumeRange = 100
-      }
       // if(action.payload > 1 && action.payload <= 50 ){
-      //   state.VolumeRange = 100
-      // }
-      if(action.payload > 1 && action.payload <= 100){
-        state.VolumeRange = 0
-      }
+        //   state.VolumeRange = 100
+        // }
+        if(action.payload > 1 && action.payload <= 100){
+          state.VolumeRange = 0
+        }
+        if(action.payload < 1){
+          state.VolumeRange = 100
+        }
 
     }
 
@@ -71,7 +86,10 @@ export const {
   PlayTrack,
   NowPlayChange,
   setVolume,
-  volumeControl
+  volumeControl,
+  getUserToken,
+  getDeviceId,
+  ShuffleTrack
 } = PlayStateSlice.actions;
 
 export default PlayStateSlice;

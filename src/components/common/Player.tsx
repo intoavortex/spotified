@@ -6,9 +6,9 @@ import axios from 'axios';
 import { RootState } from "../../types/Type";
 import { SDKREADY } from "../../slices/SdkReady";
 import { UpdatePlayerState } from "../../slices/PlayState";
-import { setVolume } from "../../slices/PlayState";
+import { setVolume, getDeviceId } from "../../slices/PlayState";
 
-import playTrackInfo from "../../js/api/PlayTrackInfo";
+import PlayTrackInfo from "../../js/api/PlayTrackInfo";
 
 
 import PlayInfo from '../player/layout/PlayInfo'
@@ -111,7 +111,7 @@ const Player = (props) => {
 
       setSdkPlayer(player);
 
-      console.log(player);
+      // console.log(player);
 
       player.connect().then(success => {
         if (success) {
@@ -121,7 +121,14 @@ const Player = (props) => {
 
       // player ready
       player.addListener('ready', ({ device_id }) => {
-        playTrackInfo(device_id, props.token)
+        PlayTrackInfo(device_id, props.token)
+        dispatch(getDeviceId(device_id))
+
+        player.getVolume().then(volume => {
+          let volume_percentage = volume * 100;
+          console.log(`플레이어에서 세팅한 볼륨 ${volume_percentage}%`);
+          dispatch(setVolume(volume_percentage))
+        });
       });
 
       // state가 변경될 때
@@ -137,14 +144,7 @@ const Player = (props) => {
         //   }
         //   console.log('❤️‍🔥 current', state);
         // });
-        // dispatch(UpdatePlayerState(state))
-
-        player.getVolume().then(volume => {
-          let volume_percentage = volume * 100;
-          console.log(`The volume of the player is ${volume_percentage}%`);
-          dispatch(setVolume(volume_percentage))
-        });
-
+        dispatch(UpdatePlayerState(state))
       });
 
       // player connect

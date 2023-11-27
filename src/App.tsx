@@ -7,10 +7,12 @@ import './App.css';
 import Player from './components/common/Player';
 import SideList from './components/common/SideList';
 import Container from './container/common/Container'
+import { getUserToken } from "./slices/PlayState";
 
 import styled from 'styled-components';
 import { Reset } from 'styled-reset'
 import axios from 'axios';
+import { useDispatch } from "react-redux"
 
 const Wrap = styled.div`
   display:flex;
@@ -23,6 +25,7 @@ const Wrap = styled.div`
 
 function App() {
   const [token, setToken] = useState('');
+  const dispatch = useDispatch();
 
   async function getToken() {
     const res = await axios.get('http://localhost:8888/access-token');
@@ -32,8 +35,8 @@ function App() {
   useEffect(() => {
     getToken();
     if (!token) return console.log('토큰 없음');
-    console.log('token success: ', token);
-
+    console.log('token success:', token);
+    dispatch(getUserToken(token));
   }, [token]);
 
   return (
