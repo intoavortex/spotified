@@ -13,6 +13,7 @@ const PlayStateSlice = createSlice({
     IsPlay: false,
     IsPause: true,
     IsShuffle: false,
+    IsRepeat: 'off',
     volumeBtn: '',
     deviceId: '',
     PlayerToken: '',
@@ -75,6 +76,12 @@ const PlayStateSlice = createSlice({
           state.VolumeRange = 100
         }
 
+    },
+
+    SetRepeat(state, action){
+      if(action.payload === 'off') { state.IsRepeat = 'context' }
+      if(action.payload === 'context') { state.IsRepeat = 'track' }
+      if(action.payload === 'track') { state.IsRepeat = 'off' }
     }
 
   }
@@ -89,7 +96,8 @@ export const {
   volumeControl,
   getUserToken,
   getDeviceId,
-  ShuffleTrack
+  ShuffleTrack,
+  SetRepeat,
 } = PlayStateSlice.actions;
 
 export default PlayStateSlice;

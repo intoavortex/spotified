@@ -29,7 +29,8 @@ export default function VolumeButton({ player, volumeData, onClickVolumeChange }
     console.log(VolumeRange);
   }, [volumeData])
 
-  const volumehandler = () => {
+  const volumehandler = (e) => {
+    e.preventDefault()
     console.log(VolumeRange);
     player.setVolume(VolumeRange / 100);
     dispatch(volumeControl(VolumeRange));
@@ -38,7 +39,7 @@ export default function VolumeButton({ player, volumeData, onClickVolumeChange }
 
   return (
     <>
-      <Button title='볼륨' onClick={(e) => { volumehandler() }}>
+      <Button title='볼륨' onClick={(e) => { volumehandler(e) }}>
         {VolumeRange >= 61 && VolumeRange <= 100 && <BsFillVolumeUpFill size='20' className={'svgIcon'}/>}
         {VolumeRange >= 1 && VolumeRange <= 60 && <BsFillVolumeDownFill size='20' className={'svgIcon'}/>}
         {VolumeRange < 1 && <BsFillVolumeOffFill size='20' className={'svgIcon'}/>}

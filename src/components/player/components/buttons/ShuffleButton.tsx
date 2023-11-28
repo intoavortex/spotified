@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import axios from "axios";
 import { IoMdShuffle } from 'react-icons/io';
 import Button from "./common/Button";
-import getTokenApi from '../../../../js/api/getToken';
+import GetToken from '../../../../js/api/GetToken';
 
 // import PlayTrackShuffle from "../../../../js/api/PlayTrackShuffle";
 import { useSelector, useDispatch } from "react-redux"
@@ -16,7 +16,7 @@ export default function ShuffleButton() {
 
   const PlayTrackShuffle = useCallback(async (IsShuffle) => {
     try {
-      const token = await getTokenApi();
+      const token = await GetToken();
       let deviceIdData = await GetDeviceId();
       const deviceId = deviceIdData.devices[0].id
 
@@ -36,9 +36,12 @@ export default function ShuffleButton() {
     }
   }, []);
 
+  useEffect(() => {
+    dispatch(ShuffleTrack(true))
+  }, [])
 
   const ShuffleHandler = (e) => {
-    e.stopPropagation();
+    e.preventDefault();
     PlayTrackShuffle(IsShuffle)
     IsShuffle === true? dispatch(ShuffleTrack(false)) : dispatch(ShuffleTrack(true));
   }
@@ -47,8 +50,8 @@ export default function ShuffleButton() {
     <>
       <Button title='무작위' onClick={(e) => ShuffleHandler(e)}>
         { IsShuffle === true ?
-          <IoMdShuffle size='22' color='#feac00'/> :
-          <IoMdShuffle size='22' className={'svgIcon'}/>
+          <IoMdShuffle size='22' className={'svgIcon'}/> :
+          <IoMdShuffle size='22' color='#feac00'/>
         }
       </Button>
     </>

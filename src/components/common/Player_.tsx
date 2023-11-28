@@ -11,7 +11,7 @@ import { MdOutlineLyrics, MdKeyboardArrowDown, MdKeyboardArrowUp } from 'react-i
 import { HiPlay, HiPause } from 'react-icons/hi';
 import { TbRepeatOnce, TbRepeat, TbDevices } from 'react-icons/tb';
 
-import getTokenApi from '../../js/api/getToken';
+import GetToken from '../../js/api/GetToken';
 
 interface StyledType {
   isTopActive: boolean
@@ -384,7 +384,7 @@ export default function BottomPlayer() {
 
   /* 토큰 또 가져옴 또큰임 걍 */
   async function getToken(){
-    const getToken = await getTokenApi();
+    const getToken = await GetToken();
     return getToken.access_token;
   }
 

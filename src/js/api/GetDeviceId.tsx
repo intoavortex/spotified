@@ -1,11 +1,11 @@
 import axios from 'axios';
 import { useSelector } from "react-redux"
 import { RootState } from "../../types/Type";
-import getToken from './getToken';
+import GetToken from './GetToken';
 
 
 export default async function GetDeviceId() {
-  const accessToken = await getToken()
+  const accessToken = await GetToken()
   const url = `https://api.spotify.com/v1/me/player/devices`;
   const token = `Bearer ${accessToken.access_token}`;
 

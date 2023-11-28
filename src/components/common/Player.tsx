@@ -111,7 +111,7 @@ const Player = (props) => {
 
       setSdkPlayer(player);
 
-      // console.log(player);
+      console.log(player);
 
       player.connect().then(success => {
         if (success) {
