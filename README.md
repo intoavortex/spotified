@@ -23,8 +23,8 @@ Spotify 웹 플레이어 💭
   - 작업 예정: PIP
 - TrackBar
   - 완료: play bar
-  - 작업 중: 
-  - 작업 예정: shuffle
+  - 작업 중: shuffle, repeat
+  - 작업 예정: 
 - PlayControl
   - 완료: volume bar
   - 작업 중: volume button
