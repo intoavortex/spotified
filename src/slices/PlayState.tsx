@@ -83,7 +83,6 @@ const PlayStateSlice = createSlice({
       if(action.payload === 'context') { state.IsRepeat = 'track' }
       if(action.payload === 'track') { state.IsRepeat = 'off' }
     }
-
   }
 });
 

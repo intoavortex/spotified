@@ -3,13 +3,13 @@ import { useSelector, useDispatch } from "react-redux"
 import styled from 'styled-components';
 import axios from 'axios';
 
+import GetToken from '../../js/api/GetToken';
+import PlayTrackInfo from "../../js/api/PlayTrackInfo";
+
 import { RootState } from "../../types/Type";
 import { SDKREADY } from "../../slices/SdkReady";
 import { UpdatePlayerState } from "../../slices/PlayState";
 import { setVolume, getDeviceId } from "../../slices/PlayState";
-
-import PlayTrackInfo from "../../js/api/PlayTrackInfo";
-
 
 import PlayInfo from '../player/layout/PlayInfo'
 import TrackBar from '../player/layout/TrackBar'
@@ -77,14 +77,17 @@ const Container = styled.div`
   }
 `
 
-const Player = (props) => {
+const Player = () => {
   const isSdkReady = useSelector((state: RootState) => state.SdkReady.isSdkReady);
   const dispatch = useDispatch();
   const [sdkPlayer, setSdkPlayer] = useState(null);
 
-  useEffect(() => {
-    if(!props.token) return console.log('token undefined');
+  async function getToken(){
+    const getToken = await GetToken();
+    return getToken.access_token;
+  }
 
+  useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://sdk.scdn.co/spotify-player.js';
     script.async = true;
@@ -94,18 +97,15 @@ const Player = (props) => {
     window.onSpotifyWebPlaybackSDKReady = () => {
       dispatch(SDKREADY(true));
     };
-  }, [props.token]);
+  }, []);
 
   const initPlayer = async () => {
     try {
-      if (!props.token) {
-        console.error('Token is undefined.');
-        return;
-      }
+      const token = await getToken();
 
       const player = new window.Spotify.Player({
         name: 'ᴢᴇɪ ꜱᴘᴏᴛɪғʏ ᴡᴇʙ ᴘʟᴀʏᴇʀ',
-        getOAuthToken: cb => { cb(props.token); },
+        getOAuthToken: cb => { cb(token); },
         volume: 1
       });
 
@@ -121,7 +121,7 @@ const Player = (props) => {
 
       // player ready
       player.addListener('ready', ({ device_id }) => {
-        PlayTrackInfo(device_id, props.token)
+        PlayTrackInfo(device_id, token)
         dispatch(getDeviceId(device_id))
 
         player.getVolume().then(volume => {
@@ -145,6 +145,8 @@ const Player = (props) => {
         //   console.log('❤️‍🔥 current', state);
         // });
         dispatch(UpdatePlayerState(state))
+        console.log(state);
+
       });
 
       // player connect
@@ -159,12 +161,12 @@ const Player = (props) => {
     if (isSdkReady) {
       initPlayer();
     }
-  }, [isSdkReady, props.token]);
+  }, [isSdkReady]);
 
   return (
     <Container>
       <PlayInfo />
-      <TrackBar player={sdkPlayer} token={props.token}/>
+      <TrackBar player={sdkPlayer} />
       <PlayControl player={sdkPlayer}/>
     </Container>
   );

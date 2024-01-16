@@ -31,7 +31,6 @@ export default function VolumeButton({ player, volumeData, onClickVolumeChange }
 
   const volumehandler = (e) => {
     e.preventDefault()
-    console.log(VolumeRange);
     player.setVolume(VolumeRange / 100);
     dispatch(volumeControl(VolumeRange));
     onClickVolumeChange(String(VolumeRange))

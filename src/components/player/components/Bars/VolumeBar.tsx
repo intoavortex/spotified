@@ -5,16 +5,20 @@ import { useSelector, useDispatch } from "react-redux"
 import { RootState } from "../../../../types/Type";
 
 import { volumeControl, setVolume } from "../../../../slices/PlayState";
-import { click } from "@testing-library/user-event/dist/click";
 
 export default function VolumeBar({ player, onVolumeChange, clickVolumeData }) {
   const dispatch = useDispatch();
   const VolumeRange = useSelector((state: RootState) => state.playState.VolumeRange);
 
-  useEffect(() => {
-    if (!player) return;
-    player.setVolume(VolumeRange / 100);
-  }, [VolumeRange])
+  // useEffect(() => {
+  //   if (!player) return;
+  //   player.setVolume(VolumeRange / 100);
+  // }, [VolumeRange])
+
+  /**
+   * 실행 순서 명확히
+   *
+   */
 
   useEffect(() => {
     if (!clickVolumeData) return;

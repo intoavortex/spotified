@@ -17,7 +17,7 @@ export default function RepeatButton() {
   const IsRepeat = useSelector((state: RootState) => state.playState.IsRepeat);
 
 
-  const PlayTrackShuffle = useCallback(async (IsRepeat) => {
+  const PlayTrackRepeat = useCallback(async (IsRepeat) => {
     try {
       const token = await GetToken();
       let deviceIdData = await GetDeviceId();
@@ -39,16 +39,18 @@ export default function RepeatButton() {
     }
   }, []);
 
+  /**
+   * api 받아와서 보여주기
+   */
+
   const RepeatHandler = (e) => {
     e.preventDefault();
-    PlayTrackShuffle(IsRepeat)
     dispatch(SetRepeat(IsRepeat))
-    console.log(IsRepeat);
   }
 
   useEffect(() => {
-    dispatch(SetRepeat('off'))
-  }, [])
+    PlayTrackRepeat(IsRepeat)
+  }, [IsRepeat]);
 
   return (
     <>

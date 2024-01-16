@@ -1,5 +1,5 @@
 import React from 'react';
-// import logo from './logo.svg';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 
 import './App.css';
@@ -7,12 +7,9 @@ import './App.css';
 import Player from './components/common/Player';
 import SideList from './components/common/SideList';
 import Container from './container/common/Container'
-import { getUserToken } from "./slices/PlayState";
 
 import styled from 'styled-components';
 import { Reset } from 'styled-reset'
-import axios from 'axios';
-import { useDispatch } from "react-redux"
 
 const Wrap = styled.div`
   display:flex;
@@ -24,32 +21,15 @@ const Wrap = styled.div`
 
 
 function App() {
-  const [token, setToken] = useState('');
-  const dispatch = useDispatch();
-
-  async function getToken() {
-    const res = await axios.get('http://localhost:8888/access-token');
-    setToken(res.data.access_token);
-  }
-
-  useEffect(() => {
-    getToken();
-    if (!token) return console.log('토큰 없음');
-    console.log('token success:', token);
-    dispatch(getUserToken(token));
-  }, [token]);
 
   return (
     <>
       <Reset />
-      { (token === '') ? '로그인하시게' :
-        <Wrap className="App">
-          <SideList />
-          <Container />
-          {/* <Player /> */}
-          <Player token={token}/>
-        </Wrap>
-      }
+      <Wrap className="App">
+        <SideList />
+        <Container />
+        <Player />
+      </Wrap>
     </>
   );
 }

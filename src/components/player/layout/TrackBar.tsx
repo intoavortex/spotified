@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { useSelector, useDispatch } from "react-redux"
 import { RootState } from "../../../types/Type";
 
-import playTrackInfo from "../../../js/api/PlayTrackInfo";
 import { NowPlayChange } from "../../../slices/PlayState";
 
 import PlayBar from "../components/Bars/PlayBar";
@@ -38,7 +37,7 @@ const PlayTime = styled.span`
 
 
 
-export default function TrackBar({ player, token }) {
+export default function TrackBar({ player }) {
   const dispatch = useDispatch();
   const isPause = useSelector((state: RootState) => state.playState.IsPause);
   const duration = useSelector((state: RootState) => state.playState.Duration);

@@ -7,13 +7,14 @@ import { RootState } from "../../../types/Type";
 import { IsCoverToggle } from "../../../slices/PlayState";
 
 interface StyledType {
-  isTopActive: boolean
+  $isTopActive: boolean
 }
 
 let TopAlbumCover = styled.div<StyledType>`
-  width: 400px;
+  width:100%;
+  max-width: 400px;
   position: absolute;
-  left:${(props) => (props.isTopActive === true ? '-400px' : '0')};
+  left:${(props) => (props.$isTopActive === true ? '-400px' : '0')};
   bottom:90px;
   z-index:1;
   transition:all .3s ease;
@@ -48,8 +49,8 @@ let LeftAlbumCover = styled.div<StyledType>`
   height: 56px;
   border-radius: 4px;
   overflow: hidden;
-  position:${(props) => (props.isTopActive === true ? 'relative' : 'absolute')};
-  left:${(props) => (props.isTopActive === true ? '0' : '-400px')};
+  position:${(props) => (props.$isTopActive === true ? 'relative' : 'absolute')};
+  left:${(props) => (props.$isTopActive === true ? '0' : '-400px')};
   bottom: 0;
   z-index:1;
   transition:all .3s ease;
@@ -97,15 +98,15 @@ export default function AlbumCover() {
 
   return (
     <>
-      <TopAlbumCover isTopActive={playState.isCoverToggle}>
-        <TopCoverBtn onClick={() => {CoverHandler()}} isTopActive={playState.isCoverToggle}>
+      <TopAlbumCover $isTopActive={playState.isCoverToggle}>
+        <TopCoverBtn onClick={() => {CoverHandler()}} $isTopActive={playState.isCoverToggle}>
           <MdKeyboardArrowDown size='20'/>
         </TopCoverBtn>
         <img src={playState.AlbumCover} alt=''/>
       </TopAlbumCover>
 
-      <LeftAlbumCover isTopActive={playState.isCoverToggle}>
-        <LeftCoverBtn onClick={() => {CoverHandler()}} isTopActive={playState.isCoverToggle}>
+      <LeftAlbumCover $isTopActive={playState.isCoverToggle}>
+        <LeftCoverBtn onClick={() => {CoverHandler()}} $isTopActive={playState.isCoverToggle}>
           <MdKeyboardArrowDown size='20'/>
         </LeftCoverBtn>
         <img src={playState.AlbumCover} alt=''/>

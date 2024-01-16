@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 import Header from "../../components/common/Header";
 import CoverThumbnailList from "../../components/list/CoverThumbnailList";
+import { Children } from "react";
 
 const Wrap = styled.div`
   width: calc(100% - 400px);
@@ -51,6 +52,7 @@ export function Container() {
     <Wrap>
       <Header />
       <ContentCotainer>
+        {/* { Children } */}
         <Contents>
           <CoverThumbnailList title={'아니 기능 할 거'}/>
           <CoverThumbnailList title={'개만내 진짜루~'}/>
