@@ -15,6 +15,7 @@
 - - -
 
 Spotify 웹 플레이어 💭
+‼️ netlify 배포 이슈 → 기능 작업 완료 후 작업 예정
 
 **[ Update Note 1.0 ]**
 - PlayInfo
